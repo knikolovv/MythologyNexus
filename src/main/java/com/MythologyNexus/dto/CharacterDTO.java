@@ -1,24 +1,25 @@
 package com.MythologyNexus.dto;
 
+import com.MythologyNexus.model.Power;
+
 import java.util.Set;
 
 public class CharacterDTO {
     private Long id;
     private String name;
     private String description;
-    private Set<String> powers;
+    private String type;
     private String mythology;
+    private Set<String> powers;
     private Set<AssociatedCharacterDTO> associatedCharacters;
 
-
-    public CharacterDTO(Long id, String name, String description, String mythologyName, Set<String> powers, Set<AssociatedCharacterDTO> associatedCharacters) {
-        this.id = id;
+    public CharacterDTO(String name, String description, String type, String mythology, Set<String> powers, Set<AssociatedCharacterDTO> associatedCharacters) {
         this.name = name;
         this.description = description;
-        this.mythology = mythologyName;
+        this.type = type;
+        this.mythology = mythology;
         this.powers = powers;
         this.associatedCharacters = associatedCharacters;
-
     }
 
     public Long getId() {
@@ -43,6 +44,14 @@ public class CharacterDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getMythology() {

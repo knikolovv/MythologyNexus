@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,25 +23,24 @@ public class CharacterController {
 
     @PostMapping("/create")
     public ResponseEntity<Character> createCharacter(@RequestBody Character character) {
-        Character savedCharacter = characterService.createOrUpdateCharacter(character);
+        Character savedCharacter = characterService.createCharacter(character);
         return new ResponseEntity<>(savedCharacter, HttpStatus.CREATED);
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<Character> updateCharacter(@RequestBody Character character) {
-        Long characterId = character.getId();
+    @PatchMapping ("/update/{id}")
+    public ResponseEntity<Character> updateCharacter(@PathVariable Long id, @RequestBody Character character) {
 
-        if (characterId == null || characterService.findCharacterById(characterId) == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (characterService.findCharacterById(id) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Character with " + id + " was not found!");
         }
 
-        Character updatedCharacter = characterService.createOrUpdateCharacter(character);
+        Character updatedCharacter = characterService.updateCharacter(id,character);
         return ResponseEntity.ok(updatedCharacter);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteCharacter(@PathVariable Long id) {
-        characterService.deleteCharacter(id);
+        characterService.deleteCharacterById(id);
         return ResponseEntity.noContent().build();
     }
 

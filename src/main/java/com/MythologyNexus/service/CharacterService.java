@@ -4,8 +4,10 @@ import com.MythologyNexus.dto.AssociatedCharacterDTO;
 import com.MythologyNexus.dto.CharacterDTO;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.Mythology;
+import com.MythologyNexus.model.Power;
 import com.MythologyNexus.repository.CharacterRepo;
 import com.MythologyNexus.repository.MythologyRepo;
+import com.MythologyNexus.repository.PowerRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,11 +28,17 @@ public class CharacterService {
 
     private final MythologyRepo mythologyRepo;
 
+    private final PowerRepo powerRepo;
+
     @Autowired
-    public CharacterService(CharacterRepo characterRepo, MythologyRepo mythologyRepo) {
+    public CharacterService(CharacterRepo characterRepo, MythologyRepo mythologyRepo, PowerRepo powerRepo) {
         this.characterRepo = characterRepo;
         this.mythologyRepo = mythologyRepo;
+        this.powerRepo = powerRepo;
     }
+
+    @Autowired
+
 
     public List<Character> getAllCharacters() {
         return characterRepo.findAll();
@@ -45,7 +54,18 @@ public class CharacterService {
         if (character == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The Character with name " + name + " was not found!");
         }
-        return new CharacterDTO(character.getId(), character.getName(), character.getDescription(), character.getMythology().getName(), character.getPowers(), findAssociatedCharacters(character));
+
+        Set<String> powerNames = character.getPowers().stream()
+                .map(Power::getPowerName)
+                .collect(Collectors.toSet());
+
+
+        return new CharacterDTO(character.getName(),
+                character.getDescription(),
+                character.getType(),
+                character.getMythology().getName(),
+                powerNames,
+                findAssociatedCharacters(character));
     }
 
     public CharacterDTO findCharacterDTOById(Long id) {
@@ -54,10 +74,20 @@ public class CharacterService {
         if (character == null) {
             return null;
         }
-        return new CharacterDTO(character.getId(), character.getName(), character.getDescription(), character.getMythology().getName(), character.getPowers(), findAssociatedCharacters(character));
+
+        Set<String> powerNames = character.getPowers().stream()
+                .map(Power::getPowerName)
+                .collect(Collectors.toSet());
+
+        return new CharacterDTO(character.getName(),
+                character.getDescription(),
+                character.getType(),
+                character.getMythology().getName(),
+                powerNames,
+                findAssociatedCharacters(character));
     }
 
-    public Character createOrUpdateCharacter(Character character) {
+    public Character createCharacter(Character character) {
         Mythology mythology = character.getMythology();
 
         Optional<Mythology> existingMythology = mythologyRepo.findByName(mythology.getName());
@@ -68,10 +98,57 @@ public class CharacterService {
             mythologyRepo.save(mythology);
         }
 
+        Set<Power> powers = new HashSet<>();
+        for (Power power : character.getPowers()) {
+            Power existingPower = powerRepo.findByPowerName(power.getPowerName())
+                    .orElseGet(() -> powerRepo.save(power));
+            powers.add(existingPower);
+        }
+
+        character.setPowers(powers);
         return characterRepo.save(character);
     }
 
-    public void deleteCharacter(Long id) {
+    public Character updateCharacter(Long id,Character updatedCharacter) {
+
+        Character existingCharacter = characterRepo.findById(id)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Character not found!"));
+
+
+        Mythology mythology = updatedCharacter.getMythology();
+
+        if (mythology != null) {
+            mythologyRepo.findByName(mythology.getName())
+                    .ifPresentOrElse(existingCharacter::setMythology,
+                    () -> {
+                        Mythology newMythology= mythologyRepo.save(mythology);
+                        existingCharacter.setMythology(newMythology);
+                    });
+        }
+
+
+        if (updatedCharacter.getPowers() != null) {
+            Set<Power> updatedPowers = updatedCharacter.getPowers().stream()
+                    .map(power -> powerRepo.findByPowerName(power.getPowerName())
+                            .orElseGet(() -> powerRepo.save(power)))
+                    .collect(Collectors.toSet());
+            existingCharacter.setPowers(updatedPowers);
+        }
+
+
+        Optional.ofNullable(updatedCharacter.getName())
+                .ifPresent(existingCharacter::setName);
+
+        Optional.ofNullable(updatedCharacter.getDescription())
+                .ifPresent(existingCharacter::setDescription);
+
+        Optional.ofNullable(updatedCharacter.getType())
+                .ifPresent(existingCharacter::setType);
+
+        return characterRepo.save(existingCharacter);
+    }
+
+    public void deleteCharacterById(Long id) {
         characterRepo.deleteById(id);
     }
 

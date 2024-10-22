@@ -1,44 +1,40 @@
 package com.MythologyNexus.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "Character")
 public class Character {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+    @NotBlank(message = "Character name must not be empty!")
     private String name;
     private String description;
-
-    @ManyToOne
+    private String type;
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "mythology_id", nullable = false)
-    @NotNull
     private Mythology mythology;
-    @ElementCollection
-    @CollectionTable(name = "character_powers")
-    private Set<String> powers;
+    @ManyToMany
+    @JoinTable(name = "character_associated_powers",
+            joinColumns = @JoinColumn(name = "character_id"),
+            inverseJoinColumns = @JoinColumn(name = "power_id"))
+    private Set<Power> powers = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "character_associated_characters",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_characters_id"))
+    @JsonIgnoreProperties("associatedCharacters")
     private Set<Character> associatedCharacters = new HashSet<>();
 
     public Character() {
-    }
-
-    public Character(Long id, String name, String description, Set<String> powers, Mythology mythology, Set<Character> associatedCharacters) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.powers = powers;
-        this.mythology = mythology;
-        this.associatedCharacters = associatedCharacters;
     }
 
     public void setId(Long id) {
@@ -65,11 +61,19 @@ public class Character {
         this.description = description;
     }
 
-    public Set<String> getPowers() {
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Set<Power> getPowers() {
         return powers;
     }
 
-    public void setPowers(Set<String> powers) {
+    public void setPowers(Set<Power> powers) {
         this.powers = powers;
     }
 
