@@ -3,7 +3,6 @@ package com.MythologyNexus.controller;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.service.MythologyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +20,6 @@ public class MythologyController {
     @GetMapping("/id/{id}")
     public ResponseEntity<Mythology> getMythologyById(@PathVariable Long id) {
         Mythology mythology = mythologyService.findMythologyById(id);
-
-        if (mythology == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return ResponseEntity.ok(mythology);
 
     }

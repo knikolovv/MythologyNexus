@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -29,13 +28,15 @@ public class CharacterController {
 
     @PatchMapping ("/update/{id}")
     public ResponseEntity<Character> updateCharacter(@PathVariable Long id, @RequestBody Character character) {
-
-        if (characterService.findCharacterById(id) == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Character with " + id + " was not found!");
-        }
-
         Character updatedCharacter = characterService.updateCharacter(id,character);
         return ResponseEntity.ok(updatedCharacter);
+    }
+
+    @PatchMapping("update/{characterName}/remove-associate-by-name/{associateCharacterName}")
+    public ResponseEntity<CharacterDTO> removeAssociatedCharacterByName(@PathVariable String characterName
+            , @PathVariable String associateCharacterName) {
+        characterService.removeAssociatedCharacter(characterName,associateCharacterName);
+        return ResponseEntity.ok(characterService.findFullCharacterByName(characterName));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -47,9 +48,6 @@ public class CharacterController {
     @GetMapping("/id/{id}")
     public ResponseEntity<CharacterDTO> getCharacterById(@PathVariable Long id) {
         CharacterDTO characterDTO = characterService.findCharacterDTOById(id);
-        if (characterDTO == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return ResponseEntity.ok(characterDTO);
     }
 
@@ -59,9 +57,11 @@ public class CharacterController {
         return ResponseEntity.ok(characterDTO);
     }
 
-    @PostMapping("/{characterId}/associate-by-name/{associatedCharacterName}")
-    public ResponseEntity<Character> addAssociatedCharacter(@PathVariable Long characterId,@PathVariable String associatedCharacterName) {
-        return characterService.addAssociatedCharacter(characterId,associatedCharacterName);
+    @PatchMapping("/update/{characterName}/associate-by-name-with/{associateCharacterName}")
+    public ResponseEntity<CharacterDTO> addAssociatedCharacter(@PathVariable String characterName
+            , @PathVariable String associateCharacterName) {
+        characterService.addAssociatedCharacter(characterName, associateCharacterName);
+        return ResponseEntity.ok(characterService.findFullCharacterByName(characterName));
     }
 
     @GetMapping("/getAll")

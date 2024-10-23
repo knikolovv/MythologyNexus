@@ -3,8 +3,6 @@ package com.MythologyNexus.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.Objects;
-
 @Entity
 @Table(name = "powers")
 public class Power {
@@ -39,16 +37,4 @@ public class Power {
         this.powerName = powerName;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Power power)) return false;
-        return powerName != null &&
-               powerName.equalsIgnoreCase(power.getPowerName());
-    }
-
-    @Override
-    public int hashCode() {
-        return powerName != null ? powerName.toLowerCase().hashCode() : 0;
-    }
 }
