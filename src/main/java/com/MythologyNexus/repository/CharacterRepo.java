@@ -10,4 +10,6 @@ public interface CharacterRepo extends JpaRepository<Character, Long> {
     Optional<Character> findByName(String name);
 
     List<Character> findByMythologyId(Long id);
+
+    List<Character> findByType(String type);
 }

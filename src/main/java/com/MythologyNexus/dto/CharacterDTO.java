@@ -1,7 +1,5 @@
 package com.MythologyNexus.dto;
 
-import com.MythologyNexus.model.Power;
-
 import java.util.Set;
 
 public class CharacterDTO {
@@ -21,6 +19,10 @@ public class CharacterDTO {
         this.powers = powers;
         this.associatedCharacters = associatedCharacters;
     }
+
+    public CharacterDTO() {
+    }
+
 
     public Long getId() {
         return id;

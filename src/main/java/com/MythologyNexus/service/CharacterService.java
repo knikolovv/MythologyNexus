@@ -37,9 +37,6 @@ public class CharacterService {
         this.powerRepo = powerRepo;
     }
 
-    @Autowired
-
-
     public List<Character> getAllCharacters() {
         return characterRepo.findAll();
     }
@@ -149,7 +146,28 @@ public class CharacterService {
         characterRepo.deleteById(id);
     }
 
-    public ResponseEntity<Character> addAssociatedCharacter(String primaryCharacterName, String associateCharacterName) {
+    public List<CharacterDTO> findAllCharactersByType(String type) {
+        List<Character> allCharactersByType = characterRepo.findByType(type);
+
+        return allCharactersByType.stream().map(character -> {
+            CharacterDTO characterDTO = new CharacterDTO();
+            characterDTO.setId(character.getId());
+            characterDTO.setName(character.getName());
+            characterDTO.setDescription(character.getDescription() != null ?
+                    character.getDescription() : null);
+            characterDTO.setType(character.getType());
+            characterDTO.setMythology(characterDTO.getMythology() != null ?
+                    characterDTO.getMythology() : null);
+            characterDTO.setPowers(character.getPowers() != null ?
+                    character.getPowers().stream()
+                            .map(Power::getPowerName)
+                            .collect(Collectors.toSet()) :
+                    new HashSet<>());
+            return characterDTO;
+        }).collect(Collectors.toList());
+    }
+
+    public void addAssociatedCharacter(String primaryCharacterName, String associateCharacterName) {
         Character primaryCharacter = characterRepo.findByName(primaryCharacterName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary character not found"));
         Character associatedCharacter = characterRepo.findByName(associateCharacterName)
@@ -162,10 +180,10 @@ public class CharacterService {
             characterRepo.save(associatedCharacter);
 
         }
-        return ResponseEntity.ok(primaryCharacter);
+        ResponseEntity.ok(primaryCharacter);
     }
 
-    public ResponseEntity<Character> removeAssociatedCharacter(String primaryCharacterName, String associateCharacterName) {
+    public void removeAssociatedCharacter(String primaryCharacterName, String associateCharacterName) {
         Character primaryCharacter = characterRepo.findByName(primaryCharacterName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary character not found"));
         Character associatedCharacter = characterRepo.findByName(associateCharacterName)
@@ -177,7 +195,7 @@ public class CharacterService {
             characterRepo.save(primaryCharacter);
             characterRepo.save(associatedCharacter);
         }
-        return ResponseEntity.ok(primaryCharacter);
+        ResponseEntity.ok(primaryCharacter);
     }
 
     private Set<AssociatedCharacterDTO> findAssociatedCharacters(Character character) {

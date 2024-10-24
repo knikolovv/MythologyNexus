@@ -32,7 +32,7 @@ public class CharacterController {
         return ResponseEntity.ok(updatedCharacter);
     }
 
-    @PatchMapping("update/{characterName}/remove-associate-by-name/{associateCharacterName}")
+    @PatchMapping("/update/{characterName}/remove-associate-by-name/{associateCharacterName}")
     public ResponseEntity<CharacterDTO> removeAssociatedCharacterByName(@PathVariable String characterName
             , @PathVariable String associateCharacterName) {
         characterService.removeAssociatedCharacter(characterName,associateCharacterName);
@@ -51,10 +51,16 @@ public class CharacterController {
         return ResponseEntity.ok(characterDTO);
     }
 
-    @GetMapping("name/{name}")
+    @GetMapping("/name/{name}")
     public ResponseEntity<CharacterDTO> findCharacterByName(@PathVariable String name) {
         CharacterDTO characterDTO = characterService.findFullCharacterByName(name);
         return ResponseEntity.ok(characterDTO);
+    }
+
+    @GetMapping("/type/{type}")
+    public ResponseEntity<List<CharacterDTO>> findCharactersByType(@PathVariable String type) {
+        List<CharacterDTO> characterDTOList = characterService.findAllCharactersByType(type);
+        return ResponseEntity.ok(characterDTOList);
     }
 
     @PatchMapping("/update/{characterName}/associate-by-name-with/{associateCharacterName}")
