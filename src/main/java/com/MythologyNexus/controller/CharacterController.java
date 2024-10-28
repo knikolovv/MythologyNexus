@@ -70,7 +70,7 @@ public class CharacterController {
         return ResponseEntity.ok(characterService.findFullCharacterByName(characterName));
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/findAll")
     public ResponseEntity<List<Character>> getAllCharacters() {
         List<Character> allCharacters = characterService.getAllCharacters();
         return ResponseEntity.ok(allCharacters);

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,8 +26,25 @@ public class MythologyService {
         this.characterRepo = characterRepo;
     }
 
+    public List<Mythology> findAllMythologies() {
+        return mythologyRepo.findAll();
+    }
+
     public Mythology createMythology(Mythology mythology) {
         return mythologyRepo.save(mythology);
+    }
+
+    public Mythology updateMythology(Long id, Mythology updatedMythology) {
+        Mythology existingMythology = mythologyRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"The Mythology was not found"));
+
+        Optional.ofNullable(updatedMythology.getName())
+                .ifPresent(existingMythology::setName);
+
+        Optional.ofNullable(updatedMythology.getDescription())
+                .ifPresent(existingMythology::setDescription);
+
+        return mythologyRepo.save(existingMythology);
     }
 
     public void deleteMythology(Long id) {
