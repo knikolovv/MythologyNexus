@@ -19,29 +19,29 @@ public class MythologyController {
         this.mythologyService = mythologyService;
     }
 
-    @GetMapping("/findAll")
+    @GetMapping()
     public ResponseEntity<List<Mythology>> findAllMythologies() {
         return ResponseEntity.ok(mythologyService.findAllMythologies());
     }
 
-    @GetMapping("/id/{id}")
+    @PostMapping()
+    public Mythology createMythology(@RequestBody Mythology mythology) {
+        return mythologyService.createMythology(mythology);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<Mythology> getMythologyById(@PathVariable Long id) {
         Mythology mythology = mythologyService.findMythologyById(id);
         return ResponseEntity.ok(mythology);
     }
 
-    @PostMapping("/create")
-    public Mythology createMythology(@RequestBody Mythology mythology) {
-        return mythologyService.createMythology(mythology);
-    }
-
-    @PatchMapping("/update/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Mythology> updateMythology(@PathVariable Long id, @RequestBody Mythology mythology) {
         Mythology updateMythology = mythologyService.updateMythology(id,mythology);
         return ResponseEntity.ok(updateMythology);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMythology(@PathVariable Long id) {
         mythologyService.deleteMythology(id);
         return ResponseEntity.noContent().build();

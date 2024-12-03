@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 
 public class PowerService {
 
     private final PowerRepo powerRepo;
-
 
     @Autowired
     public PowerService(PowerRepo powerRepo) {
@@ -28,5 +28,23 @@ public class PowerService {
 
     public List<Power> getAllPowers() {
         return powerRepo.findAll();
+    }
+
+    public Power createPower(Power power) {
+        return powerRepo.save(power);
+    }
+
+    public Power updatePowerById(Long id, Power power) {
+        Power existingPower = powerRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Power with id " + id + " was not found!"));
+
+        Optional.ofNullable(power.getName())
+                .ifPresent(existingPower::setName);
+
+        return powerRepo.save(existingPower);
+    }
+
+    public void deletePower(Long id) {
+        powerRepo.deleteById(id);
     }
 }

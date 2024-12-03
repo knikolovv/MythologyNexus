@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Character")
@@ -24,14 +24,20 @@ public class Character {
     @JoinTable(name = "character_associated_powers",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "power_id"))
-    private Set<Power> powers = new HashSet<>();
+    private List<Power> powers;
 
     @ManyToMany
     @JoinTable(name = "character_associated_characters",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_characters_id"))
     @JsonIgnoreProperties("associatedCharacters")
-    private Set<Character> associatedCharacters = new HashSet<>();
+    private List<Character> associatedCharacters;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "character_associated_artefacts",
+            joinColumns = @JoinColumn(name = "character_id"),
+            inverseJoinColumns = @JoinColumn(name = "associated_artefact_id"))
+    private List<Artefact> artefacts = new ArrayList<>();
 
     public Character() {
     }
@@ -68,11 +74,11 @@ public class Character {
         this.type = type;
     }
 
-    public Set<Power> getPowers() {
+    public List<Power> getPowers() {
         return powers;
     }
 
-    public void setPowers(Set<Power> powers) {
+    public void setPowers(List<Power> powers) {
         this.powers = powers;
     }
 
@@ -84,11 +90,11 @@ public class Character {
         this.mythology = mythology;
     }
 
-    public Set<Character> getAssociatedCharacters() {
+    public List<Character> getAssociatedCharacters() {
         return associatedCharacters;
     }
 
-    public void setAssociatedCharacters(Set<Character> associatedCharacters) {
+    public void setAssociatedCharacters(List<Character> associatedCharacters) {
         this.associatedCharacters = associatedCharacters;
     }
 
@@ -103,4 +109,11 @@ public class Character {
         }
     }
 
+    public List<Artefact> getArtefacts() {
+        return artefacts;
+    }
+
+    public void setArtefacts(List<Artefact> characterArtefacts) {
+        this.artefacts = characterArtefacts;
+    }
 }

@@ -20,59 +20,60 @@ public class CharacterController {
         this.characterService = characterService;
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<Character> createCharacter(@RequestBody Character character) {
         Character savedCharacter = characterService.createCharacter(character);
         return new ResponseEntity<>(savedCharacter, HttpStatus.CREATED);
     }
 
-    @PatchMapping ("/update/{id}")
+    @GetMapping()
+    public ResponseEntity<List<Character>> getAllCharacters() {
+        List<Character> allCharacters = characterService.getAllCharacters();
+        return ResponseEntity.ok(allCharacters);
+    }
+    @GetMapping("/names")
+    public ResponseEntity<List<String>> getAllCharacterNames() {
+        return ResponseEntity.ok(characterService.getAllCharactersNames());
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<CharacterDTO> findCharacterByName(@PathVariable String name) {
+        CharacterDTO characterDTO = characterService.findCharacterByName(name);
+        return ResponseEntity.ok(characterDTO);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<CharacterDTO>> findCharactersByType(
+            @RequestParam String type) {
+        List<CharacterDTO> characterDTOList = characterService.findAllCharactersByType(type);
+        return ResponseEntity.ok(characterDTOList);
+    }
+
+    @PatchMapping ("/{id}")
     public ResponseEntity<Character> updateCharacter(@PathVariable Long id, @RequestBody Character character) {
         Character updatedCharacter = characterService.updateCharacter(id,character);
         return ResponseEntity.ok(updatedCharacter);
     }
 
-    @PatchMapping("/update/{characterName}/remove-associate-by-name/{associateCharacterName}")
+    @PatchMapping("/{characterName}/associate-with/{associateCharacterName}")
+    public ResponseEntity<CharacterDTO> addAssociatedCharacter(@PathVariable String characterName
+            , @PathVariable String associateCharacterName) {
+        characterService.addAssociatedCharacter(characterName, associateCharacterName);
+        return ResponseEntity.ok(characterService.findCharacterByName(characterName));
+    }
+
+    @PatchMapping("/{characterName}/remove-associate/{associateCharacterName}")
     public ResponseEntity<CharacterDTO> removeAssociatedCharacterByName(@PathVariable String characterName
             , @PathVariable String associateCharacterName) {
         characterService.removeAssociatedCharacter(characterName,associateCharacterName);
-        return ResponseEntity.ok(characterService.findFullCharacterByName(characterName));
+        return ResponseEntity.ok(characterService.findCharacterByName(characterName));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCharacter(@PathVariable Long id) {
         characterService.deleteCharacterById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<CharacterDTO> getCharacterById(@PathVariable Long id) {
-        CharacterDTO characterDTO = characterService.findCharacterDTOById(id);
-        return ResponseEntity.ok(characterDTO);
-    }
 
-    @GetMapping("/name/{name}")
-    public ResponseEntity<CharacterDTO> findCharacterByName(@PathVariable String name) {
-        CharacterDTO characterDTO = characterService.findFullCharacterByName(name);
-        return ResponseEntity.ok(characterDTO);
-    }
-
-    @GetMapping("/type/{type}")
-    public ResponseEntity<List<CharacterDTO>> findCharactersByType(@PathVariable String type) {
-        List<CharacterDTO> characterDTOList = characterService.findAllCharactersByType(type);
-        return ResponseEntity.ok(characterDTOList);
-    }
-
-    @PatchMapping("/update/{characterName}/associate-by-name-with/{associateCharacterName}")
-    public ResponseEntity<CharacterDTO> addAssociatedCharacter(@PathVariable String characterName
-            , @PathVariable String associateCharacterName) {
-        characterService.addAssociatedCharacter(characterName, associateCharacterName);
-        return ResponseEntity.ok(characterService.findFullCharacterByName(characterName));
-    }
-
-    @GetMapping("/findAll")
-    public ResponseEntity<List<Character>> getAllCharacters() {
-        List<Character> allCharacters = characterService.getAllCharacters();
-        return ResponseEntity.ok(allCharacters);
-    }
 }

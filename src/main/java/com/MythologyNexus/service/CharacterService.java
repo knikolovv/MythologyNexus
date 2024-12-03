@@ -1,10 +1,11 @@
 package com.MythologyNexus.service;
 
-import com.MythologyNexus.dto.AssociatedCharacterDTO;
 import com.MythologyNexus.dto.CharacterDTO;
+import com.MythologyNexus.model.Artefact;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.model.Power;
+import com.MythologyNexus.repository.ArtefactRepo;
 import com.MythologyNexus.repository.CharacterRepo;
 import com.MythologyNexus.repository.MythologyRepo;
 import com.MythologyNexus.repository.PowerRepo;
@@ -15,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,56 +27,44 @@ public class CharacterService {
     private final MythologyRepo mythologyRepo;
 
     private final PowerRepo powerRepo;
+    private final ArtefactRepo artefactRepo;
 
     @Autowired
-    public CharacterService(CharacterRepo characterRepo, MythologyRepo mythologyRepo, PowerRepo powerRepo) {
+    public CharacterService(CharacterRepo characterRepo, MythologyRepo mythologyRepo, PowerRepo powerRepo, ArtefactRepo artefactRepo) {
         this.characterRepo = characterRepo;
         this.mythologyRepo = mythologyRepo;
         this.powerRepo = powerRepo;
+        this.artefactRepo = artefactRepo;
     }
 
     public List<Character> getAllCharacters() {
         return characterRepo.findAll();
     }
+    public CharacterDTO findCharacterByName(String name) {
+        Character character = characterRepo.findByName(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "The Character with name " + name + " was not found!"));
 
-    public Character findCharacterById(Long id) {
-        return characterRepo.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Character was not found!"));
-    }
+        List<String> powerNames = character.getPowers().stream()
+                .map(Power::getName)
+                .collect(Collectors.toList());
 
-    public CharacterDTO findFullCharacterByName(String name) {
-        Character character = characterRepo.findByName(name).orElse(null);
-        if (character == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The Character with name " + name + " was not found!");
-        }
-
-        Set<String> powerNames = character.getPowers().stream()
-                .map(Power::getPowerName)
-                .collect(Collectors.toSet());
+        List<String> artefacts = character.getArtefacts().stream()
+                .map(Artefact::getName)
+                .collect(Collectors.toList());
 
 
-        return new CharacterDTO(character.getName(),
+        return new CharacterDTO(character.getId(),
+                character.getName(),
                 character.getDescription(),
                 character.getType(),
                 character.getMythology().getName(),
                 powerNames,
+                artefacts,
                 findAssociatedCharacters(character));
     }
 
-    public CharacterDTO findCharacterDTOById(Long id) {
-        Character character = characterRepo.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Character with " + id + " was not found"));
-
-        Set<String> powerNames = character.getPowers().stream()
-                .map(Power::getPowerName)
-                .collect(Collectors.toSet());
-
-        return new CharacterDTO(character.getName(),
-                character.getDescription(),
-                character.getType(),
-                character.getMythology().getName(),
-                powerNames,
-                findAssociatedCharacters(character));
+    public List<String> getAllCharactersNames() {
+        return characterRepo.findAll().stream().map(Character::getName).collect(Collectors.toList());
     }
 
     public Character createCharacter(Character character) {
@@ -92,12 +78,14 @@ public class CharacterService {
             mythologyRepo.save(mythology);
         }
 
-        Set<Power> powers = new HashSet<>();
+        List<Power> powers = new ArrayList<>();
         for (Power power : character.getPowers()) {
-            Power existingPower = powerRepo.findByPowerName(power.getPowerName())
+            Power existingPower = powerRepo.findByName(power.getName())
                     .orElseGet(() -> powerRepo.save(power));
             powers.add(existingPower);
         }
+
+
 
         character.setPowers(powers);
         return characterRepo.save(character);
@@ -111,7 +99,7 @@ public class CharacterService {
 
         Mythology mythology = updatedCharacter.getMythology();
 
-        if (mythology != null) {
+        if (mythology != null && !mythology.getName().isEmpty()) {
             mythologyRepo.findByName(mythology.getName())
                     .ifPresentOrElse(existingCharacter::setMythology,
                     () -> {
@@ -122,11 +110,19 @@ public class CharacterService {
 
 
         if (updatedCharacter.getPowers() != null && !updatedCharacter.getPowers().isEmpty()) {
-            Set<Power> updatedPowers = updatedCharacter.getPowers().stream()
-                    .map(power -> powerRepo.findByPowerName(power.getPowerName())
+            List<Power> updatedPowers = updatedCharacter.getPowers().stream()
+                    .map(power -> powerRepo.findByName(power.getName())
                             .orElseGet(() -> powerRepo.save(power)))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             existingCharacter.setPowers(updatedPowers);
+        }
+
+        if (updatedCharacter.getArtefacts() != null && !updatedCharacter.getArtefacts().isEmpty()) {
+            List<Artefact> updatedArtefacts = updatedCharacter.getArtefacts().stream()
+                    .map(artefact -> artefactRepo.findByName(artefact.getName())
+                            .orElseGet(()-> artefactRepo.save(artefact)))
+                    .collect(Collectors.toList());
+            existingCharacter.setArtefacts(updatedArtefacts);
         }
 
 
@@ -139,11 +135,20 @@ public class CharacterService {
         Optional.ofNullable(updatedCharacter.getType())
                 .ifPresent(existingCharacter::setType);
 
+        Optional.ofNullable(updatedCharacter.getArtefacts())
+                .ifPresent(existingCharacter::setArtefacts);
+
+
         return characterRepo.save(existingCharacter);
     }
 
     public void deleteCharacterById(Long id) {
-        characterRepo.deleteById(id);
+        if(characterRepo.findById(id).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No character with id " + id + " was found!");
+        }
+        else {
+        characterRepo.deleteById(id); }
+
     }
 
     public List<CharacterDTO> findAllCharactersByType(String type) {
@@ -151,18 +156,33 @@ public class CharacterService {
 
         return allCharactersByType.stream().map(character -> {
             CharacterDTO characterDTO = new CharacterDTO();
+
             characterDTO.setId(character.getId());
+
             characterDTO.setName(character.getName());
+
             characterDTO.setDescription(character.getDescription() != null ?
                     character.getDescription() : null);
+
             characterDTO.setType(character.getType());
-            characterDTO.setMythology(characterDTO.getMythology() != null ?
-                    characterDTO.getMythology() : null);
+
+            characterDTO.setMythology(character.getMythology() != null ?
+                    character.getMythology().getName() : null);
+
             characterDTO.setPowers(character.getPowers() != null ?
                     character.getPowers().stream()
-                            .map(Power::getPowerName)
-                            .collect(Collectors.toSet()) :
-                    new HashSet<>());
+                            .map(Power::getName)
+                            .collect(Collectors.toList()) :
+                    new ArrayList<>());
+
+            characterDTO.setAssociatedArtefacts(character.getArtefacts() != null ?
+                    character.getArtefacts().stream()
+                            .map(Artefact::getName)
+                            .collect(Collectors.toList()) :
+                    new ArrayList<>());
+
+            characterDTO.setAssociatedCharacters(findAssociatedCharacters(character));
+
             return characterDTO;
         }).collect(Collectors.toList());
     }
@@ -198,11 +218,11 @@ public class CharacterService {
         ResponseEntity.ok(primaryCharacter);
     }
 
-    private Set<AssociatedCharacterDTO> findAssociatedCharacters(Character character) {
-        return character.getAssociatedCharacters().stream()
-                .map(associatedCharacter -> new AssociatedCharacterDTO(associatedCharacter.getName()))
-                .collect(Collectors.toSet());
+    private List<String> findAssociatedCharacters(Character character) {
+        return character.getAssociatedCharacters()
+                .stream()
+                .map(Character::getName)
+                .collect(Collectors.toList());
     }
-
 
 }

@@ -12,13 +12,13 @@ public class Power {
     private Long powerId;
 
     @NotBlank
-    private String powerName;
+    private String name;
 
     public Power() {
     }
 
-    public Power(String powerName) {
-        this.powerName = powerName;
+    public Power(String name) {
+        this.name = name;
     }
 
     public void setPowerId(Long powerId) {
@@ -29,12 +29,12 @@ public class Power {
         return powerId;
     }
 
-    public String getPowerName() {
-        return powerName;
+    public String getName() {
+        return name;
     }
 
-    public void setPowerName(String powerName) {
-        this.powerName = powerName;
+    public void setName(String powerName) {
+        this.name = powerName;
     }
 
 }
