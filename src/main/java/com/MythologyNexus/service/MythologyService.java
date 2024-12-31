@@ -1,5 +1,6 @@
 package com.MythologyNexus.service;
 
+import com.MythologyNexus.dto.MythologyDTO;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.repository.CharacterRepo;
@@ -26,17 +27,20 @@ public class MythologyService {
         this.characterRepo = characterRepo;
     }
 
-    public List<Mythology> findAllMythologies() {
-        return mythologyRepo.findAll();
+    public List<MythologyDTO> findAllMythologies() {
+        return mythologyRepo.findAll()
+                .stream()
+                .map(this::mythologyToMythologyDTO)
+                .toList();
     }
 
     public Mythology createMythology(Mythology mythology) {
         return mythologyRepo.save(mythology);
     }
 
-    public Mythology updateMythology(Long id, Mythology updatedMythology) {
+    public MythologyDTO updateMythology(Long id, Mythology updatedMythology) {
         Mythology existingMythology = mythologyRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"The Mythology was not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "The Mythology was not found"));
 
         Optional.ofNullable(updatedMythology.getName())
                 .ifPresent(existingMythology::setName);
@@ -44,20 +48,32 @@ public class MythologyService {
         Optional.ofNullable(updatedMythology.getDescription())
                 .ifPresent(existingMythology::setDescription);
 
-        return mythologyRepo.save(existingMythology);
+        mythologyRepo.save(existingMythology);
+        return mythologyToMythologyDTO(existingMythology);
     }
 
     public void deleteMythology(Long id) {
         List<Character> associatedCharacters = characterRepo.findByMythologyId(id);
 
-        if(!associatedCharacters.isEmpty()) {
+        if (!associatedCharacters.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete mythology with ID " + id + " because it's associated with one or more characters.");
         }
         mythologyRepo.deleteById(id);
     }
 
-    public Mythology findMythologyById(Long id) {
-        return mythologyRepo.findById(id).orElseThrow(() ->
+    public MythologyDTO findMythologyById(Long id) {
+        Mythology mythology = mythologyRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Mythology was not found!"));
+
+        return mythologyToMythologyDTO(mythology);
+    }
+
+    private MythologyDTO mythologyToMythologyDTO(Mythology mythology) {
+        return new MythologyDTO(mythology.getId(),
+                mythology.getName(),
+                mythology.getDescription(),
+                mythology.getCharacters()
+                        .stream().map(Character::getName)
+                        .toList());
     }
 }

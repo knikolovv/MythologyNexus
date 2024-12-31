@@ -1,5 +1,6 @@
 package com.MythologyNexus.controller;
 
+import com.MythologyNexus.dto.PowerDTO;
 import com.MythologyNexus.model.Power;
 import com.MythologyNexus.service.PowerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ public class PowerController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Power>> findAllPowers() {
-        List<Power> allPowers = powerService.getAllPowers();
+    public ResponseEntity<List<PowerDTO>> findAllPowers() {
+        List<PowerDTO> allPowers = powerService.getAllPowers();
         return ResponseEntity.ok(allPowers);
     }
 
@@ -38,8 +39,8 @@ public class PowerController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Power> updatePower(@PathVariable Long id, @RequestBody Power power) {
-        Power updatePower = powerService.updatePowerById(id, power);
+    public ResponseEntity<PowerDTO> updatePower(@PathVariable Long id, @RequestBody Power power) {
+        PowerDTO updatePower = powerService.updatePowerById(id, power);
         return ResponseEntity.ok(updatePower);
     }
 

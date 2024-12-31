@@ -15,25 +15,31 @@ public class Character {
     private Long id;
     @NotBlank(message = "Character name must not be empty!")
     private String name;
+
     private String description;
+
     private String type;
+
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "mythology_id", nullable = false)
     private Mythology mythology;
+
     @ManyToMany
     @JoinTable(name = "character_associated_powers",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "power_id"))
     private List<Power> powers;
 
-    @ManyToMany
+    // help mapped by what ? Its in the same class
+    @ManyToMany(mappedBy = "")
     @JoinTable(name = "character_associated_characters",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_characters_id"))
     @JsonIgnoreProperties("associatedCharacters")
+
     private List<Character> associatedCharacters;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "character_associated_artefacts",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_artefact_id"))
@@ -103,6 +109,7 @@ public class Character {
             associatedCharacters.add(character);
         }
     }
+
     public void removeAssociatedCharacter(Character character) {
         if (character != null) {
             associatedCharacters.remove(character);

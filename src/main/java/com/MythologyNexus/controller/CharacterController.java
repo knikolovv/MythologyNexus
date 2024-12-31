@@ -21,14 +21,14 @@ public class CharacterController {
     }
 
     @PostMapping()
-    public ResponseEntity<Character> createCharacter(@RequestBody Character character) {
-        Character savedCharacter = characterService.createCharacter(character);
+    public ResponseEntity<CharacterDTO> createCharacter(@RequestBody Character character) {
+        CharacterDTO savedCharacter = characterService.createCharacter(character);
         return new ResponseEntity<>(savedCharacter, HttpStatus.CREATED);
     }
 
     @GetMapping()
-    public ResponseEntity<List<Character>> getAllCharacters() {
-        List<Character> allCharacters = characterService.getAllCharacters();
+    public ResponseEntity<List<CharacterDTO>> getAllCharacters() {
+        List<CharacterDTO> allCharacters = characterService.getAllCharacters();
         return ResponseEntity.ok(allCharacters);
     }
     @GetMapping("/names")
@@ -50,8 +50,8 @@ public class CharacterController {
     }
 
     @PatchMapping ("/{id}")
-    public ResponseEntity<Character> updateCharacter(@PathVariable Long id, @RequestBody Character character) {
-        Character updatedCharacter = characterService.updateCharacter(id,character);
+    public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id, @RequestBody Character character) {
+        CharacterDTO updatedCharacter = characterService.updateCharacter(id,character);
         return ResponseEntity.ok(updatedCharacter);
     }
 
