@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CharacterRepo extends JpaRepository<Character, Long> {
-    Optional<Character> findByName(String name);
+    Optional<Character> findByNameIgnoreCase(String name);
 
     List<Character> findByMythologyId(Long id);
 
-    List<Character> findByType(String type);
+    List<Character> findByTypeIgnoreCase(String type);
 }

@@ -1,5 +1,6 @@
 package com.MythologyNexus.service;
 
+import com.MythologyNexus.dto.ArtefactDTO;
 import com.MythologyNexus.model.Artefact;
 import com.MythologyNexus.repository.ArtefactRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,21 @@ public class ArtefactService {
         this.artefactRepo = artefactRepo;
     }
 
-    public List<Artefact> getAllArtefacts() {
-        return artefactRepo.findAll();
+    public List<ArtefactDTO> getAllArtefacts() {
+        return artefactRepo.findAll()
+                .stream()
+                .map(this::artefactToArtefactDTO)
+                .toList();
     }
 
     public Artefact createArtefact(Artefact artefact) {
         return artefactRepo.save(artefact);
     }
 
-    public Artefact findArtefactByName(String name) {
-        return artefactRepo.findByName(name)
+    public ArtefactDTO findArtefactByName(String name) {
+        Artefact artefact = artefactRepo.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Artefact with " + name + "was not found!"));
+        return artefactToArtefactDTO(artefact);
     }
 
     public void deleteArtefactById(Long id) {
@@ -39,7 +44,7 @@ public class ArtefactService {
     }
 
 
-    public Artefact updateArtefact(Long id, Artefact artefact) {
+    public ArtefactDTO updateArtefact(Long id, Artefact artefact) {
         Artefact existingArtefact = artefactRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artefact with " + id + " was not found!"));
 
@@ -48,8 +53,13 @@ public class ArtefactService {
 
         Optional.ofNullable(artefact.getDescription())
                 .ifPresent(existingArtefact::setDescription);
+        artefactRepo.save(existingArtefact);
+        return artefactToArtefactDTO(existingArtefact);
+    }
 
-        return artefactRepo.save(existingArtefact);
-
+    private ArtefactDTO artefactToArtefactDTO(Artefact artefact) {
+        return new ArtefactDTO(artefact.getId(),
+                artefact.getName(),
+                artefact.getDescription());
     }
 }

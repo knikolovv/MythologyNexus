@@ -1,5 +1,6 @@
 package com.MythologyNexus.controller;
 
+import com.MythologyNexus.dto.ArtefactDTO;
 import com.MythologyNexus.model.Artefact;
 import com.MythologyNexus.service.ArtefactService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,21 +25,22 @@ public class ArtefactController {
         Artefact savedArtefact = artefactService.createArtefact(artefact);
         return new ResponseEntity<>(savedArtefact, HttpStatus.OK);
     }
+
     @GetMapping
-    public ResponseEntity<List<Artefact>> findAllArtefacts() {
-        List<Artefact> artefacts = artefactService.getAllArtefacts();
+    public ResponseEntity<List<ArtefactDTO>> findAllArtefacts() {
+        List<ArtefactDTO> artefacts = artefactService.getAllArtefacts();
         return ResponseEntity.ok(artefacts);
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<Artefact> getArtefactByName(@PathVariable String name) {
-        Artefact artefact = artefactService.findArtefactByName(name);
+    public ResponseEntity<ArtefactDTO> getArtefactByName(@PathVariable String name) {
+        ArtefactDTO artefact = artefactService.findArtefactByName(name);
         return ResponseEntity.ok(artefact);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Artefact> updateArtefactById(@PathVariable Long id,@RequestBody Artefact artefact) {
-        Artefact updateArtefact = artefactService.updateArtefact(id,artefact);
+    public ResponseEntity<ArtefactDTO> updateArtefactById(@PathVariable Long id, @RequestBody Artefact artefact) {
+        ArtefactDTO updateArtefact = artefactService.updateArtefact(id,artefact);
         return ResponseEntity.ok(updateArtefact);
     }
 

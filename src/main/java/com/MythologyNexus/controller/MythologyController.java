@@ -1,5 +1,6 @@
 package com.MythologyNexus.controller;
 
+import com.MythologyNexus.dto.MythologyDTO;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.service.MythologyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class MythologyController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Mythology>> findAllMythologies() {
+    public ResponseEntity<List<MythologyDTO>> findAllMythologies() {
         return ResponseEntity.ok(mythologyService.findAllMythologies());
     }
 
@@ -30,14 +31,14 @@ public class MythologyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Mythology> getMythologyById(@PathVariable Long id) {
-        Mythology mythology = mythologyService.findMythologyById(id);
+    public ResponseEntity<MythologyDTO> getMythologyById(@PathVariable Long id) {
+        MythologyDTO mythology = mythologyService.findMythologyById(id);
         return ResponseEntity.ok(mythology);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Mythology> updateMythology(@PathVariable Long id, @RequestBody Mythology mythology) {
-        Mythology updateMythology = mythologyService.updateMythology(id,mythology);
+    public ResponseEntity<MythologyDTO> updateMythology(@PathVariable Long id, @RequestBody Mythology mythology) {
+        MythologyDTO updateMythology = mythologyService.updateMythology(id,mythology);
         return ResponseEntity.ok(updateMythology);
     }
 

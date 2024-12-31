@@ -1,6 +1,5 @@
 package com.MythologyNexus.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -18,8 +17,8 @@ public class Mythology {
     private String name;
     private String description;
 
-    @OneToMany(mappedBy = "mythology", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonBackReference
+    @OneToMany(mappedBy = "mythology", cascade = CascadeType.ALL)
+
     private List<Character> characters = new ArrayList<>();
 
     public void setId(Long id) {

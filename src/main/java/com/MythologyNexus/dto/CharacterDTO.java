@@ -9,8 +9,9 @@ public class CharacterDTO {
     private String type;
     private String mythology;
     private List<String> powers;
-    private List<String> associatedCharacters;
     private List<String> associatedArtefacts;
+    private List<String> associatedCharacters;
+
 
 
     public CharacterDTO(Long id, String name, String description, String type, String mythology, List<String> powers, List<String> associatedArtefacts, List<String> associatedCharacters) {
@@ -20,13 +21,12 @@ public class CharacterDTO {
         this.type = type;
         this.mythology = mythology;
         this.powers = powers;
-        this.associatedCharacters = associatedCharacters;
         this.associatedArtefacts = associatedArtefacts;
+        this.associatedCharacters = associatedCharacters;
     }
 
     public CharacterDTO() {
     }
-
 
     public Long getId() {
         return id;
