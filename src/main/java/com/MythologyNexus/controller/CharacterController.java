@@ -15,6 +15,7 @@ import java.util.List;
 public class CharacterController {
 
     private final CharacterService characterService;
+
     @Autowired
     public CharacterController(CharacterService characterService) {
         this.characterService = characterService;
@@ -31,6 +32,7 @@ public class CharacterController {
         List<CharacterDTO> allCharacters = characterService.getAllCharacters();
         return ResponseEntity.ok(allCharacters);
     }
+
     @GetMapping("/names")
     public ResponseEntity<List<String>> getAllCharacterNames() {
         return ResponseEntity.ok(characterService.getAllCharactersNames());
@@ -65,7 +67,7 @@ public class CharacterController {
     @PatchMapping("/{characterName}/remove-associate/{associateCharacterName}")
     public ResponseEntity<CharacterDTO> removeAssociatedCharacterByName(@PathVariable String characterName
             , @PathVariable String associateCharacterName) {
-        characterService.removeAssociatedCharacter(characterName,associateCharacterName);
+        characterService.removeAssociatedCharacter(characterName, associateCharacterName);
         return ResponseEntity.ok(characterService.findCharacterByName(characterName));
     }
 

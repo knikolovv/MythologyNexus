@@ -30,7 +30,6 @@ public class Character {
             inverseJoinColumns = @JoinColumn(name = "power_id"))
     private List<Power> powers;
 
-    // help mapped by what ? Its in the same class
     @ManyToMany(mappedBy = "")
     @JoinTable(name = "character_associated_characters",
             joinColumns = @JoinColumn(name = "character_id"),
@@ -39,7 +38,8 @@ public class Character {
 
     private List<Character> associatedCharacters;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "character_associated_artefacts",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_artefact_id"))

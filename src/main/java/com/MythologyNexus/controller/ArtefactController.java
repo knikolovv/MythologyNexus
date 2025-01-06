@@ -44,7 +44,7 @@ public class ArtefactController {
         return ResponseEntity.ok(updateArtefact);
     }
 
-    @DeleteMapping("/id/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteArtefactById(@PathVariable Long id) {
         artefactService.deleteArtefactById(id);
         return ResponseEntity.ok().build();

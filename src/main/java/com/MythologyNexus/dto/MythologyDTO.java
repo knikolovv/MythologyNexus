@@ -1,30 +1,35 @@
 package com.MythologyNexus.dto;
 
-import java.util.ArrayList;
+import com.MythologyNexus.model.Character;
+import com.MythologyNexus.model.Mythology;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MythologyDTO {
+
     private Long id;
+
     private String name;
     private String description;
-    private List<String> characters = new ArrayList<>();
 
-    public MythologyDTO(Long id, String name, String description, List<String> characters) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.characters = characters;
-    }
+    private List<String> characters;
 
-    public MythologyDTO() {
-    }
-
-    public Long getId() {
-        return id;
+    public MythologyDTO(Mythology mythology) {
+        this.id = mythology.getId();
+        this.name = mythology.getName();
+        this.description = mythology.getDescription();
+        this.characters = mythology.getCharacters().stream()
+                .map(Character::getName)
+                .collect(Collectors.toList());
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
