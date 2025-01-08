@@ -14,11 +14,19 @@ import java.util.List;
 @RequestMapping("/characters")
 public class CharacterController {
 
+
     private final CharacterService characterService;
 
     @Autowired
     public CharacterController(CharacterService characterService) {
         this.characterService = characterService;
+    }
+
+    @GetMapping("/multipleFilters")
+    public ResponseEntity<List<CharacterDTO>> getAllCharactersByTypeOrMythology(@RequestParam(required = false) String type,
+                                                                                @RequestParam(required = false) String mythology) {
+        List<CharacterDTO> characters = characterService.findCharacterByCriteriaUsingCriteriaAPI(type,mythology);
+        return ResponseEntity.ok(characters);
     }
 
     @PostMapping()
@@ -45,15 +53,14 @@ public class CharacterController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<CharacterDTO>> findCharactersByType(
-            @RequestParam String type) {
+    public ResponseEntity<List<CharacterDTO>> findCharactersByType(@RequestParam String type) {
         List<CharacterDTO> characterDTOList = characterService.findAllCharactersByType(type);
         return ResponseEntity.ok(characterDTOList);
     }
 
-    @PatchMapping ("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id, @RequestBody Character character) {
-        CharacterDTO updatedCharacter = characterService.updateCharacter(id,character);
+        CharacterDTO updatedCharacter = characterService.updateCharacter(id, character);
         return ResponseEntity.ok(updatedCharacter);
     }
 

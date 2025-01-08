@@ -9,6 +9,12 @@ import com.MythologyNexus.repository.ArtefactRepo;
 import com.MythologyNexus.repository.CharacterRepo;
 import com.MythologyNexus.repository.MythologyRepo;
 import com.MythologyNexus.repository.PowerRepo;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +30,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CharacterService {
+
+    @PersistenceContext
+    private final EntityManager entityManager;
     private final CharacterRepo characterRepo;
 
     private final MythologyRepo mythologyRepo;
@@ -33,7 +42,8 @@ public class CharacterService {
     private final ArtefactRepo artefactRepo;
 
     @Autowired
-    public CharacterService(CharacterRepo characterRepo, MythologyRepo mythologyRepo, PowerRepo powerRepo, ArtefactRepo artefactRepo) {
+    public CharacterService(EntityManager em, CharacterRepo characterRepo, MythologyRepo mythologyRepo, PowerRepo powerRepo, ArtefactRepo artefactRepo) {
+        this.entityManager = em;
         this.characterRepo = characterRepo;
         this.mythologyRepo = mythologyRepo;
         this.powerRepo = powerRepo;
@@ -41,15 +51,17 @@ public class CharacterService {
     }
 
     public List<CharacterDTO> getAllCharacters() {
-        return characterRepo.findAll().stream().map(this::characterToCharacterDTO
-        ).toList();
+        return characterRepo.findAll()
+                .stream()
+                .map(CharacterDTO::new)
+                .toList();
     }
 
     public CharacterDTO findCharacterByName(String name) {
         Character character = characterRepo.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "The Character with name " + name + " was not found!"));
 
-        return characterToCharacterDTO(character);
+        return new CharacterDTO(character);
     }
 
     public List<String> getAllCharactersNames() {
@@ -78,7 +90,7 @@ public class CharacterService {
 
         character.setPowers(powers);
         characterRepo.save(character);
-        return characterToCharacterDTO(character);
+        return new CharacterDTO(character);
     }
 
     public CharacterDTO updateCharacter(Long id, Character updatedCharacter) {
@@ -125,7 +137,7 @@ public class CharacterService {
                 .ifPresent(existingCharacter::setType);
 
         characterRepo.save(existingCharacter);
-        return characterToCharacterDTO(existingCharacter);
+        return new CharacterDTO(existingCharacter);
     }
 
     public void deleteCharacterById(Long id) {
@@ -172,6 +184,32 @@ public class CharacterService {
         }).toList();
     }
 
+    public List<CharacterDTO> findCharacterByCriteriaUsingCriteriaAPI(final String type,final String mythologyName) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Character> query = cb.createQuery(Character.class);
+        Root<Character> root = query.from(Character.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (type != null && !type.isEmpty()) {
+            predicates.add(cb.equal(root.get("type"), type));
+        }
+        if (mythologyName != null && !mythologyName.isEmpty()) {
+            Optional<Mythology> mythology = mythologyRepo.findByNameIgnoreCase(mythologyName);
+            mythology.ifPresent(mythologyFilter ->
+                    predicates.add(cb.equal(root.get("mythology"), mythologyFilter))
+            );
+        }
+
+        query.select(root).where(cb.and(predicates.toArray(new Predicate[0])));
+
+        List<Character> characters = entityManager.createQuery(query).getResultList();
+
+          return characters.stream()
+                  .map(CharacterDTO::new)
+                  .toList();
+    }
+
     public void addAssociatedCharacter(String primaryCharacterName, String associateCharacterName) {
         Character primaryCharacter = characterRepo.findByNameIgnoreCase(primaryCharacterName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary character not found"));
@@ -208,22 +246,6 @@ public class CharacterService {
                 .stream()
                 .map(Character::getName)
                 .toList();
-    }
-
-    private CharacterDTO characterToCharacterDTO(Character character) {
-        return new CharacterDTO(character.getId(),
-                character.getName(),
-                character.getDescription(),
-                character.getType(),
-                character.getMythology().getName(),
-                character.getPowers().stream()
-                        .map(Power::getName)
-                        .toList(),
-                character.getArtefacts().stream()
-                        .map(Artefact::getName)
-                        .toList(),
-                findAssociatedCharacters(character));
-
     }
 
 }
