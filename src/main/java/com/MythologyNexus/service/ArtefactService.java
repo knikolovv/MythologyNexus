@@ -2,7 +2,9 @@ package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.ArtefactDTO;
 import com.MythologyNexus.model.Artefact;
+import com.MythologyNexus.model.Character;
 import com.MythologyNexus.repository.ArtefactRepo;
+import com.MythologyNexus.repository.CharacterRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,11 +17,13 @@ import java.util.Optional;
 public class ArtefactService {
 
     private final ArtefactRepo artefactRepo;
+    private final CharacterRepo characterRepo;
 
 
     @Autowired
-    public ArtefactService(ArtefactRepo artefactRepo) {
+    public ArtefactService(ArtefactRepo artefactRepo, CharacterRepo characterRepo) {
         this.artefactRepo = artefactRepo;
+        this.characterRepo = characterRepo;
     }
 
     public List<ArtefactDTO> getAllArtefacts() {
@@ -40,6 +44,11 @@ public class ArtefactService {
     }
 
     public void deleteArtefactById(Long id) {
+        List<Character> associatedCharacters = characterRepo.findByArtefactsId(id);
+
+        if(!associatedCharacters.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete artefact with ID " + id + " because it's associated with one or more characters.");
+        }
         artefactRepo.deleteById(id);
     }
 

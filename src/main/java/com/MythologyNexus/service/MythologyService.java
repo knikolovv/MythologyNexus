@@ -69,11 +69,6 @@ public class MythologyService {
     }
 
     private MythologyDTO mythologyToMythologyDTO(Mythology mythology) {
-        return new MythologyDTO(mythology.getId(),
-                mythology.getName(),
-                mythology.getDescription(),
-                mythology.getCharacters()
-                        .stream().map(Character::getName)
-                        .toList());
+        return new MythologyDTO(mythology);
     }
 }

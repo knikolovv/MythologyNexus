@@ -1,5 +1,9 @@
 package com.MythologyNexus.dto;
 
+import com.MythologyNexus.model.Artefact;
+import com.MythologyNexus.model.Character;
+import com.MythologyNexus.model.Power;
+
 import java.util.List;
 
 public class CharacterDTO {
@@ -13,16 +17,22 @@ public class CharacterDTO {
     private List<String> associatedCharacters;
 
 
-
-    public CharacterDTO(Long id, String name, String description, String type, String mythology, List<String> powers, List<String> associatedArtefacts, List<String> associatedCharacters) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.type = type;
-        this.mythology = mythology;
-        this.powers = powers;
-        this.associatedArtefacts = associatedArtefacts;
-        this.associatedCharacters = associatedCharacters;
+    public CharacterDTO(Character character) {
+        this.id = character.getId();
+        this.name = character.getName();
+        this.description = character.getDescription();
+        this.type = character.getType();
+        this.mythology = character.getMythology().getName();
+        this.powers = character.getPowers().stream()
+                .map(Power::getName)
+                .toList();
+        this.associatedArtefacts = character.getArtefacts().stream()
+                .map(Artefact::getName)
+                .toList();
+        this.associatedCharacters = character.getAssociatedCharacters()
+                .stream()
+                .map(Character::getName)
+                .toList();
     }
 
     public CharacterDTO() {
