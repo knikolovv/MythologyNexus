@@ -9,7 +9,7 @@ public class Power {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long powerId;
+    private Long id;
 
     @NotBlank
     private String name;
@@ -17,16 +17,12 @@ public class Power {
     public Power() {
     }
 
-    public Power(String name) {
-        this.name = name;
+    public void setId(Long powerId) {
+        this.id = powerId;
     }
 
-    public void setPowerId(Long powerId) {
-        this.powerId = powerId;
-    }
-
-    public Long getPowerId() {
-        return powerId;
+    public Long getId() {
+        return id;
     }
 
     public String getName() {

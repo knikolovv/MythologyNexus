@@ -1,6 +1,7 @@
 package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.ArtefactDTO;
+import com.MythologyNexus.dto.ArtefactMapper;
 import com.MythologyNexus.model.Artefact;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.repository.ArtefactRepo;
@@ -18,18 +19,19 @@ public class ArtefactService {
 
     private final ArtefactRepo artefactRepo;
     private final CharacterRepo characterRepo;
-
+    private final ArtefactMapper artefactMapper;
 
     @Autowired
-    public ArtefactService(ArtefactRepo artefactRepo, CharacterRepo characterRepo) {
+    public ArtefactService(ArtefactRepo artefactRepo, CharacterRepo characterRepo, ArtefactMapper artefactMapper) {
         this.artefactRepo = artefactRepo;
         this.characterRepo = characterRepo;
+        this.artefactMapper = artefactMapper;
     }
 
     public List<ArtefactDTO> getAllArtefacts() {
         return artefactRepo.findAll()
                 .stream()
-                .map(this::artefactToArtefactDTO)
+                .map(artefactMapper::toDto)
                 .toList();
     }
 
@@ -40,7 +42,7 @@ public class ArtefactService {
     public ArtefactDTO findArtefactByName(String name) {
         Artefact artefact = artefactRepo.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Artefact with " + name + "was not found!"));
-        return artefactToArtefactDTO(artefact);
+        return artefactMapper.toDto(artefact);
     }
 
     public void deleteArtefactById(Long id) {
@@ -63,12 +65,6 @@ public class ArtefactService {
         Optional.ofNullable(artefact.getDescription())
                 .ifPresent(existingArtefact::setDescription);
         artefactRepo.save(existingArtefact);
-        return artefactToArtefactDTO(existingArtefact);
-    }
-
-    private ArtefactDTO artefactToArtefactDTO(Artefact artefact) {
-        return new ArtefactDTO(artefact.getId(),
-                artefact.getName(),
-                artefact.getDescription());
+        return artefactMapper.toDto(existingArtefact);
     }
 }

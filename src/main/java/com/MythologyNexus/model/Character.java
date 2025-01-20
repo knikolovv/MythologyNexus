@@ -18,7 +18,8 @@ public class Character {
 
     private String description;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private CharacterType type;
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "mythology_id", nullable = false)
@@ -30,12 +31,11 @@ public class Character {
             inverseJoinColumns = @JoinColumn(name = "power_id"))
     private List<Power> powers;
 
-    @ManyToMany(mappedBy = "")
+    @ManyToMany
     @JoinTable(name = "character_associated_characters",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_characters_id"))
     @JsonIgnoreProperties("associatedCharacters")
-
     private List<Character> associatedCharacters;
 
 
@@ -72,11 +72,11 @@ public class Character {
         this.description = description;
     }
 
-    public String getType() {
+    public CharacterType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(CharacterType type) {
         this.type = type;
     }
 
@@ -98,10 +98,6 @@ public class Character {
 
     public List<Character> getAssociatedCharacters() {
         return associatedCharacters;
-    }
-
-    public void setAssociatedCharacters(List<Character> associatedCharacters) {
-        this.associatedCharacters = associatedCharacters;
     }
 
     public void addAssociatedCharacter(Character character) {

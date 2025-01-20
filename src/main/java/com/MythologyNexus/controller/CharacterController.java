@@ -2,6 +2,7 @@ package com.MythologyNexus.controller;
 
 import com.MythologyNexus.dto.CharacterDTO;
 import com.MythologyNexus.model.Character;
+import com.MythologyNexus.model.CharacterType;
 import com.MythologyNexus.service.CharacterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class CharacterController {
 
     @GetMapping("/multipleFilters")
     public ResponseEntity<List<CharacterDTO>> getAllCharactersByTypeOrMythology(@RequestParam(required = false) String type,
-                                                                                @RequestParam(required = false) String mythology) {
+                                                                                   @RequestParam(required = false) String mythology) {
         List<CharacterDTO> characters = characterService.findCharacterByCriteriaUsingCriteriaAPI(type,mythology);
         return ResponseEntity.ok(characters);
     }
@@ -53,7 +54,7 @@ public class CharacterController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<CharacterDTO>> findCharactersByType(@RequestParam String type) {
+    public ResponseEntity<List<CharacterDTO>> findCharactersByType(@RequestParam CharacterType type) {
         List<CharacterDTO> characterDTOList = characterService.findAllCharactersByType(type);
         return ResponseEntity.ok(characterDTOList);
     }

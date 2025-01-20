@@ -1,6 +1,7 @@
 package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.PowerDTO;
+import com.MythologyNexus.dto.PowerMapper;
 import com.MythologyNexus.model.Power;
 import com.MythologyNexus.repository.PowerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-
 public class PowerService {
 
     private final PowerRepo powerRepo;
 
+    private final PowerMapper powerMapper;
+
     @Autowired
-    public PowerService(PowerRepo powerRepo) {
+    public PowerService(PowerRepo powerRepo,PowerMapper powerMapper) {
         this.powerRepo = powerRepo;
+        this.powerMapper = powerMapper;
     }
 
     public Power findPowerById(Long id) {
@@ -28,7 +31,10 @@ public class PowerService {
     }
 
     public List<PowerDTO> getAllPowers() {
-        return powerRepo.findAll().stream().map(this::powerToPowerDTO).toList();
+        return powerRepo.findAll()
+                .stream()
+                .map(powerMapper::toDto)
+                .toList();
     }
 
     public Power createPower(Power power) {
@@ -42,15 +48,11 @@ public class PowerService {
         Optional.ofNullable(power.getName())
                 .ifPresent(existingPower::setName);
         powerRepo.save(existingPower);
-        return powerToPowerDTO(existingPower);
+        return powerMapper.toDto(existingPower);
     }
 
     public void deletePower(Long id) {
         powerRepo.deleteById(id);
     }
 
-    private PowerDTO powerToPowerDTO(Power power) {
-        return new PowerDTO(power.getPowerId(),
-                power.getName());
-    }
 }

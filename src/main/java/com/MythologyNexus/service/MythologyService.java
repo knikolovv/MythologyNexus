@@ -1,6 +1,7 @@
 package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.MythologyDTO;
+import com.MythologyNexus.dto.MythologyMapper;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.repository.CharacterRepo;
@@ -21,16 +22,18 @@ public class MythologyService {
 
     private final CharacterRepo characterRepo;
 
+    private final MythologyMapper mythologyMapper;
     @Autowired
-    public MythologyService(MythologyRepo mythologyRepo, CharacterRepo characterRepo) {
+    public MythologyService(MythologyRepo mythologyRepo, CharacterRepo characterRepo, MythologyMapper mythologyMapper) {
         this.mythologyRepo = mythologyRepo;
         this.characterRepo = characterRepo;
+        this.mythologyMapper = mythologyMapper;
     }
 
     public List<MythologyDTO> findAllMythologies() {
         return mythologyRepo.findAll()
                 .stream()
-                .map(this::mythologyToMythologyDTO)
+                .map(mythologyMapper::toDto)
                 .toList();
     }
 
@@ -49,7 +52,7 @@ public class MythologyService {
                 .ifPresent(existingMythology::setDescription);
 
         mythologyRepo.save(existingMythology);
-        return mythologyToMythologyDTO(existingMythology);
+        return mythologyMapper.toDto(existingMythology);
     }
 
     public void deleteMythology(Long id) {
@@ -65,10 +68,7 @@ public class MythologyService {
         Mythology mythology = mythologyRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Mythology was not found!"));
 
-        return mythologyToMythologyDTO(mythology);
+        return mythologyMapper.toDto(mythology);
     }
 
-    private MythologyDTO mythologyToMythologyDTO(Mythology mythology) {
-        return new MythologyDTO(mythology);
-    }
 }

@@ -1,6 +1,7 @@
 package com.MythologyNexus.repository;
 
 import com.MythologyNexus.model.Character;
+import com.MythologyNexus.model.CharacterType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,7 @@ public interface CharacterRepo extends JpaRepository<Character, Long> {
 
     List<Character> findByMythologyId(Long id);
 
-    List<Character> findByTypeIgnoreCase(String type);
+    List<Character> findByType(CharacterType type);
 
     List<Character> findByArtefactsId(Long id);
 }

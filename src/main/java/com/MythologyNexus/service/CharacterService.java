@@ -1,10 +1,9 @@
 package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.CharacterDTO;
-import com.MythologyNexus.model.Artefact;
+import com.MythologyNexus.dto.CharacterMapper;
+import com.MythologyNexus.model.*;
 import com.MythologyNexus.model.Character;
-import com.MythologyNexus.model.Mythology;
-import com.MythologyNexus.model.Power;
 import com.MythologyNexus.repository.ArtefactRepo;
 import com.MythologyNexus.repository.CharacterRepo;
 import com.MythologyNexus.repository.MythologyRepo;
@@ -41,27 +40,30 @@ public class CharacterService {
 
     private final ArtefactRepo artefactRepo;
 
+    private final CharacterMapper characterMapper;
+
     @Autowired
-    public CharacterService(EntityManager em, CharacterRepo characterRepo, MythologyRepo mythologyRepo, PowerRepo powerRepo, ArtefactRepo artefactRepo) {
-        this.entityManager = em;
+    public CharacterService(EntityManager entityManager, CharacterRepo characterRepo, MythologyRepo mythologyRepo, PowerRepo powerRepo,
+                            ArtefactRepo artefactRepo, CharacterMapper characterMapper) {
+        this.entityManager = entityManager;
         this.characterRepo = characterRepo;
         this.mythologyRepo = mythologyRepo;
         this.powerRepo = powerRepo;
         this.artefactRepo = artefactRepo;
+        this.characterMapper = characterMapper;
     }
 
     public List<CharacterDTO> getAllCharacters() {
         return characterRepo.findAll()
                 .stream()
-                .map(CharacterDTO::new)
+                .map(characterMapper::toDto)
                 .toList();
     }
 
     public CharacterDTO findCharacterByName(String name) {
         Character character = characterRepo.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "The Character with name " + name + " was not found!"));
-
-        return new CharacterDTO(character);
+        return characterMapper.toDto(character);
     }
 
     public List<String> getAllCharactersNames() {
@@ -90,7 +92,7 @@ public class CharacterService {
 
         character.setPowers(powers);
         characterRepo.save(character);
-        return new CharacterDTO(character);
+        return characterMapper.toDto(character);
     }
 
     public CharacterDTO updateCharacter(Long id, Character updatedCharacter) {
@@ -137,7 +139,7 @@ public class CharacterService {
                 .ifPresent(existingCharacter::setType);
 
         characterRepo.save(existingCharacter);
-        return new CharacterDTO(existingCharacter);
+        return characterMapper.toDto(existingCharacter);
     }
 
     public void deleteCharacterById(Long id) {
@@ -148,43 +150,13 @@ public class CharacterService {
         }
     }
 
-    public List<CharacterDTO> findAllCharactersByType(String type) {
-        List<Character> allCharactersByType = characterRepo.findByTypeIgnoreCase(type);
+    public List<CharacterDTO> findAllCharactersByType(CharacterType type) {
+        List<Character> allCharactersByType = characterRepo.findByType(type);
 
-        return allCharactersByType.stream().map(character -> {
-            CharacterDTO characterDTO = new CharacterDTO();
-
-            characterDTO.setId(character.getId());
-
-            characterDTO.setName(character.getName());
-
-            characterDTO.setDescription(character.getDescription() != null ?
-                    character.getDescription() : null);
-
-            characterDTO.setType(character.getType());
-
-            characterDTO.setMythology(character.getMythology() != null ?
-                    character.getMythology().getName() : null);
-
-            characterDTO.setPowers(character.getPowers() != null ?
-                    character.getPowers().stream()
-                            .map(Power::getName)
-                            .toList() :
-                    new ArrayList<>());
-
-            characterDTO.setAssociatedArtefacts(character.getArtefacts() != null ?
-                    character.getArtefacts().stream()
-                            .map(Artefact::getName)
-                            .toList() :
-                    new ArrayList<>());
-
-            characterDTO.setAssociatedCharacters(findAssociatedCharacters(character));
-
-            return characterDTO;
-        }).toList();
+        return allCharactersByType.stream().map(characterMapper::toDto).toList();
     }
 
-    public List<CharacterDTO> findCharacterByCriteriaUsingCriteriaAPI(final String type,final String mythologyName) {
+    public List<CharacterDTO> findCharacterByCriteriaUsingCriteriaAPI(final String type, final String mythologyName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Character> query = cb.createQuery(Character.class);
         Root<Character> root = query.from(Character.class);
@@ -206,7 +178,7 @@ public class CharacterService {
         List<Character> characters = entityManager.createQuery(query).getResultList();
 
           return characters.stream()
-                  .map(CharacterDTO::new)
+                  .map(characterMapper::toDto)
                   .toList();
     }
 
@@ -239,13 +211,6 @@ public class CharacterService {
             characterRepo.save(associatedCharacter);
         }
         ResponseEntity.ok(primaryCharacter);
-    }
-
-    private List<String> findAssociatedCharacters(Character character) {
-        return character.getAssociatedCharacters()
-                .stream()
-                .map(Character::getName)
-                .toList();
     }
 
 }

@@ -18,7 +18,6 @@ public class Mythology {
     private String description;
 
     @OneToMany(mappedBy = "mythology", cascade = CascadeType.ALL)
-
     private List<Character> characters = new ArrayList<>();
 
     public void setId(Long id) {
@@ -47,14 +46,5 @@ public class Mythology {
 
     public List<Character> getCharacters() {
         return characters;
-    }
-
-    public void setCharacters(List<Character> characters) {
-        this.characters = characters;
-    }
-
-    public void addCharacter(Character character) {
-        characters.add(character);
-        character.setMythology(this);
     }
 }
