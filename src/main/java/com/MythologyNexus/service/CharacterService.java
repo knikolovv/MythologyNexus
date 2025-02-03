@@ -2,8 +2,8 @@ package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.CharacterDTO;
 import com.MythologyNexus.dto.CharacterMapper;
-import com.MythologyNexus.model.*;
 import com.MythologyNexus.model.Character;
+import com.MythologyNexus.model.*;
 import com.MythologyNexus.repository.ArtefactRepo;
 import com.MythologyNexus.repository.CharacterRepo;
 import com.MythologyNexus.repository.MythologyRepo;
@@ -24,6 +24,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,7 +82,8 @@ public class CharacterService {
         if (existingMythology.isPresent()) {
             character.setMythology(existingMythology.get());
         } else {
-            mythologyRepo.save(mythology);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The Mythology " + character.getMythology().getName() + " doesn't exist!" +
+                                                                    "Please create the Mythology first!");
         }
 
         List<Power> powers = new ArrayList<>();
@@ -100,33 +103,44 @@ public class CharacterService {
         Character existingCharacter = characterRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Character not found!"));
 
-
         Mythology mythology = updatedCharacter.getMythology();
 
         if (mythology != null && !mythology.getName().isEmpty()) {
             mythologyRepo.findByNameIgnoreCase(mythology.getName())
                     .ifPresentOrElse(existingCharacter::setMythology,
-                            () -> {
-                                Mythology newMythology = mythologyRepo.save(mythology);
-                                existingCharacter.setMythology(newMythology);
-                            });
+                            () -> existingCharacter.setMythology(mythology));
         }
 
-
         if (updatedCharacter.getPowers() != null && !updatedCharacter.getPowers().isEmpty()) {
+            List<Power> originalPowers = new ArrayList<>(existingCharacter.getPowers());
+
             List<Power> updatedPowers = updatedCharacter.getPowers().stream()
                     .map(power -> powerRepo.findByNameIgnoreCase(power.getName())
-                            .orElseGet(() -> powerRepo.save(power)))
+                            .orElse(power))
                     .collect(Collectors.toList());
+
             existingCharacter.setPowers(updatedPowers);
+
+            removeOrphanedItems(originalPowers,updatedPowers,
+                    Power::getId,
+                    powerRepo::countCharactersByPowerId,
+                    powerRepo::delete);
         }
 
         if (updatedCharacter.getArtefacts() != null && !updatedCharacter.getArtefacts().isEmpty()) {
+            List<Artefact> originalArtefacts = new ArrayList<>(existingCharacter.getArtefacts());
+
             List<Artefact> updatedArtefacts = updatedCharacter.getArtefacts().stream()
                     .map(artefact -> artefactRepo.findByNameIgnoreCase(artefact.getName())
-                            .orElseGet(() -> artefactRepo.save(artefact)))
+                            .orElse(artefact))
                     .collect(Collectors.toList());
+
             existingCharacter.setArtefacts(updatedArtefacts);
+
+            removeOrphanedItems(originalArtefacts,updatedArtefacts,
+                    Artefact::getId,
+                    artefactRepo::countCharacterByArtefactId,
+                    artefactRepo::delete);
         }
 
         Optional.ofNullable(updatedCharacter.getName())
@@ -137,6 +151,7 @@ public class CharacterService {
 
         Optional.ofNullable(updatedCharacter.getType())
                 .ifPresent(existingCharacter::setType);
+
 
         characterRepo.save(existingCharacter);
         return characterMapper.toDto(existingCharacter);
@@ -177,9 +192,9 @@ public class CharacterService {
 
         List<Character> characters = entityManager.createQuery(query).getResultList();
 
-          return characters.stream()
-                  .map(characterMapper::toDto)
-                  .toList();
+        return characters.stream()
+                .map(characterMapper::toDto)
+                .toList();
     }
 
     public void addAssociatedCharacter(String primaryCharacterName, String associateCharacterName) {
@@ -192,8 +207,6 @@ public class CharacterService {
             primaryCharacter.addAssociatedCharacter(associatedCharacter);
             associatedCharacter.addAssociatedCharacter(primaryCharacter);
             characterRepo.save(primaryCharacter);
-            characterRepo.save(associatedCharacter);
-
         }
         ResponseEntity.ok(primaryCharacter);
     }
@@ -208,9 +221,24 @@ public class CharacterService {
             primaryCharacter.removeAssociatedCharacter(associatedCharacter);
             associatedCharacter.removeAssociatedCharacter(primaryCharacter);
             characterRepo.save(primaryCharacter);
-            characterRepo.save(associatedCharacter);
         }
         ResponseEntity.ok(primaryCharacter);
+    }
+
+    private <T> void removeOrphanedItems(List<T> originalItems, List<T> updatedItems,
+                                         Function<T,Long> getIdFunction,
+                                         Function<Long,Long> countFunction,
+                                         Consumer<T> deleteFunction) {
+        List<T> orphanedItems = originalItems.stream()
+                .filter(item -> !updatedItems.contains(item))
+                .toList();
+
+        orphanedItems.forEach(item -> {
+            Long itemId = getIdFunction.apply(item);
+            if(countFunction.apply(itemId) == 0) {
+                deleteFunction.accept(item);
+            }
+        });
     }
 
 }
