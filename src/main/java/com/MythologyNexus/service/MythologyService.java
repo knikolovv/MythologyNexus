@@ -65,8 +65,8 @@ public class MythologyService {
     }
 
     public MythologyDTO findMythologyById(Long id) {
-        Mythology mythology = mythologyRepo.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Mythology was not found!"));
+        Mythology mythology = mythologyRepo.findById(id).
+                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "The Mythology was not found!"));
 
         return mythologyMapper.toDto(mythology);
     }
