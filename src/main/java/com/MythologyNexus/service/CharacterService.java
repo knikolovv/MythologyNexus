@@ -165,7 +165,7 @@ public class CharacterService {
         }
     }
 
-    public List<CharacterDTO> findAllCharactersByType(CharacterType type) {
+    public List<CharacterDTO> getAllCharactersByType(CharacterType type) {
         List<Character> allCharactersByType = characterRepo.findByType(type);
 
         return allCharactersByType.stream().map(characterMapper::toDto).toList();

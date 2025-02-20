@@ -17,8 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,29 +35,27 @@ class MythologyServiceTest {
     @InjectMocks
     private MythologyService mythologyService;
 
-    private static final Long validId = 1L;
-
     @Test
     public void testFindMythologyByIdThrowsErrorWhenGivenInvalidId() {
-        Long invalidId = 50000L;
-        when(mythologyRepo.findById(invalidId)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> mythologyService.findMythologyById(invalidId));
+        when(mythologyRepo.findById(50000L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> mythologyService.findMythologyById(50000L));
     }
 
     @Test
     public void testFindMythologyByIdWithValidIdReturnsMythologyDto() {
         Mythology mythology = new Mythology();
-        mythology.setId(validId);
+        mythology.setId(1L);
         mythology.setName("Greek");
 
-        MythologyDTO expectedDto = new MythologyDTO(validId,"Greek",null,null);
+        MythologyDTO expectedDto = new MythologyDTO(1L, "Greek", null, null);
 
-        when(mythologyRepo.findById(validId)).thenReturn(Optional.of(mythology));
+        when(mythologyRepo.findById(1L)).thenReturn(Optional.of(mythology));
         when(mythologyMapper.toDto(mythology)).thenReturn(expectedDto);
 
-        MythologyDTO actualDto = mythologyService.findMythologyById(validId);
-        assertEquals(expectedDto,actualDto);
+        MythologyDTO actualDto = mythologyService.findMythologyById(1L);
+        assertEquals(expectedDto, actualDto);
     }
 
     @Test
@@ -71,12 +68,12 @@ class MythologyServiceTest {
         norseMythology.setId(2L);
         norseMythology.setName("Norse");
 
-        List<Mythology> mythologyList = List.of(greekMythology,norseMythology);
+        List<Mythology> mythologyList = List.of(greekMythology, norseMythology);
 
-        MythologyDTO greekDto = new MythologyDTO(1L, "Greek",null,null);
-        MythologyDTO norseDto = new MythologyDTO(2L,"Norse",null,null);
+        MythologyDTO greekDto = new MythologyDTO(1L, "Greek", null, null);
+        MythologyDTO norseDto = new MythologyDTO(2L, "Norse", null, null);
 
-        List<MythologyDTO> expectedDtos = List.of(greekDto,norseDto);
+        List<MythologyDTO> expectedDtos = List.of(greekDto, norseDto);
 
         when(mythologyRepo.findAll()).thenReturn(mythologyList);
         when(mythologyMapper.toDto(greekMythology)).thenReturn(greekDto);
@@ -84,13 +81,13 @@ class MythologyServiceTest {
 
         List<MythologyDTO> actualDtos = mythologyService.findAllMythologies();
 
-        assertEquals(expectedDtos,actualDtos);
+        assertEquals(expectedDtos, actualDtos);
     }
 
     @Test
     public void testCreateMythologyMethod() {
         Mythology mythology = new Mythology();
-        mythology.setId(validId);
+        mythology.setId(1L);
         mythology.setName("MythologyName");
         mythology.setDescription("Very descriptive! Wow!");
 
@@ -100,26 +97,59 @@ class MythologyServiceTest {
 
         verify(mythologyRepo).save(mythology);
 
-        assertEquals(mythology,createdMythology);
+        assertEquals(mythology, createdMythology);
     }
 
     @Test
     public void testDeleteMythologyMethodSuccess() {
-        when(characterRepo.findByMythologyId(validId)).thenReturn(Collections.emptyList());
+        when(characterRepo.findByMythologyId(1L)).thenReturn(Collections.emptyList());
 
-        mythologyService.deleteMythology(validId);
+        mythologyService.deleteMythology(1L);
 
-        verify(mythologyRepo).deleteById(validId);
+        verify(mythologyRepo).deleteById(1L);
     }
 
     @Test
     public void testDeleteMythologyMethodFailsWhenAssociatedCharactersExist() {
 
-        when(characterRepo.findByMythologyId(validId)).thenReturn(List.of(new Character()));
+        when(characterRepo.findByMythologyId(1L)).thenReturn(List.of(new Character()));
 
-        assertThrows(ResponseStatusException.class, () -> mythologyService.deleteMythology(validId));
+        assertThrows(ResponseStatusException.class, () -> mythologyService.deleteMythology(1L));
 
-        verify(mythologyRepo,never()).deleteById(anyLong());
+        verify(mythologyRepo, never()).deleteById(anyLong());
+    }
+
+    @Test
+    public void testUpdateMythologyMethodFailsWhenGivenWrongId() {
+        Mythology mythology = new Mythology();
+        when(mythologyRepo.findById(50000L)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> mythologyService.updateMythology(50000L, mythology));
+    }
+
+    @Test
+    public void testUpdateMythologyMethodWithValidId() {
+        Mythology existingMythology = new Mythology();
+        existingMythology.setId(1L);
+        existingMythology.setName("MythologyName");
+        existingMythology.setDescription("That's a description!");
+
+        when(mythologyRepo.findById(1L)).thenReturn(Optional.of(existingMythology));
+
+        Mythology updatedMythology = new Mythology();
+        updatedMythology.setId(1L);
+        updatedMythology.setName("New Mythology Name");
+
+        MythologyDTO expectedDto = new MythologyDTO(1L, "New Mythology Name");
+
+        when(mythologyMapper.toDto(existingMythology)).thenReturn(expectedDto);
+
+        MythologyDTO actualDto = mythologyService.updateMythology(1L, updatedMythology);
+
+        assertEquals("New Mythology Name", actualDto.name());
+
+        verify(mythologyRepo).findById(anyLong());
+        verify(mythologyRepo).save(existingMythology);
     }
 
 

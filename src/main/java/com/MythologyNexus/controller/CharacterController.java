@@ -55,7 +55,7 @@ public class CharacterController {
 
     @GetMapping("/filter")
     public ResponseEntity<List<CharacterDTO>> findCharactersByType(@RequestParam CharacterType type) {
-        List<CharacterDTO> characterDTOList = characterService.findAllCharactersByType(type);
+        List<CharacterDTO> characterDTOList = characterService.getAllCharactersByType(type);
         return ResponseEntity.ok(characterDTOList);
     }
 
