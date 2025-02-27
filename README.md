@@ -80,10 +80,11 @@ Interact with the mythology data through these sample endpoints for mythology en
 For mythology characters entities:
 
 - GET /characters – Retrieve all character entries.
-- GET /mcharacters/{name} – Retrieve a specific character entry
+- GET /characters/{name} – Retrieve a specific character entry
+- GET /characters/filter -Retrieve all characters from specific character type using request paramater.
 - POST /characters – Create a new character entry.
 - PATCH /characters/{id} - Update an existing entry.
-- PATCH /characters/{characterName}/associate-with/{associateCharacterName} - Associate a character with another one.
+- PATCH /characters/{characterName}/associate-with/{associateCharacterName} - Associate an entry with another one of the same type.
 - DELETE /characters/{id} - Remove an entry.
 
 And similar endpoints for the rest of the entity types.
