@@ -24,7 +24,7 @@
 - **RESTful API:** Manage mythology data with well-defined endpoints.
 - **Java Spring Boot:** Built using Spring Boot for rapid development.
 - **Hibernate ORM:** Seamless database integration using Hibernate.
-- **TestNG Integration:** Robust testing to ensure code quality.
+- **JUnit Integration:** Robust testing to ensure code quality.
 - **Jacoco Test Coverage:** Automatically generates detailed reports ensuring thorough testing.
 
 ---
@@ -92,7 +92,7 @@ And similar endpoints for the rest of the entity types.
 
 ## Testing
 
-The project uses TestNG for unit and integration testing. Run tests with:
+The project uses JUnit for unit and integration testing. Run tests with:
 
   ```bash
   mvn test
