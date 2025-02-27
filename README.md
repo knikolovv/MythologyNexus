@@ -46,7 +46,7 @@
    ```bash
    git clone https://github.com/knikolovv/MythologyNexus.git
    cd MythologyNexus
-   
+   ```
 
 2. **Configure your database settings:**
 
