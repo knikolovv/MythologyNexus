@@ -105,6 +105,4 @@ The project uses JUnit for unit and integration testing. Run tests with:
 
 This project is licensed under the MIT License.
 
-<div align="center">
-  <h1>Enjoy</h1>
-</div>
+---
