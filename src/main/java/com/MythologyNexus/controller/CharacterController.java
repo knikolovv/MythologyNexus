@@ -14,8 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/characters")
 public class CharacterController {
-
-
     private final CharacterService characterService;
 
     @Autowired

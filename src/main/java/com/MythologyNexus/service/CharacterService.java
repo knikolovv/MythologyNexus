@@ -171,7 +171,7 @@ public class CharacterService {
         return allCharactersByType.stream().map(characterMapper::toDto).toList();
     }
 
-    public List<CharacterDTO> findCharacterByCriteriaUsingCriteriaAPI(final String type, final String mythologyName) {
+    public List<CharacterDTO> findCharacterByCriteriaUsingCriteriaAPI(String type, String mythologyName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Character> query = cb.createQuery(Character.class);
         Root<Character> root = query.from(Character.class);
@@ -202,6 +202,10 @@ public class CharacterService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Primary character not found"));
         Character associatedCharacter = characterRepo.findByNameIgnoreCase(associateCharacterName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Associated character not found"));
+
+        if (primaryCharacterName.equals(associateCharacterName)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Can not associate a character with itself!");
+        }
 
         if (!primaryCharacter.getAssociatedCharacters().contains(associatedCharacter)) {
             primaryCharacter.addAssociatedCharacter(associatedCharacter);

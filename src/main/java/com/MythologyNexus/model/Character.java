@@ -36,7 +36,7 @@ public class Character {
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_characters_id"))
     @JsonIgnoreProperties("associatedCharacters")
-    private List<Character> associatedCharacters;
+    private List<Character> associatedCharacters = new ArrayList<>();
 
 
     @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
