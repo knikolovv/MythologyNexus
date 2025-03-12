@@ -1,4 +1,4 @@
-package com.MythologyNexus.service;
+package com.MythologyNexus.service.unit;
 
 import com.MythologyNexus.dto.MythologyDTO;
 import com.MythologyNexus.dto.MythologyMapper;
@@ -6,6 +6,7 @@ import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.repository.CharacterRepo;
 import com.MythologyNexus.repository.MythologyRepo;
+import com.MythologyNexus.service.MythologyService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

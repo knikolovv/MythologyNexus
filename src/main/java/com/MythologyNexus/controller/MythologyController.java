@@ -26,8 +26,8 @@ public class MythologyController {
     }
 
     @PostMapping()
-    public Mythology createMythology(@RequestBody Mythology mythology) {
-        return mythologyService.createMythology(mythology);
+    public ResponseEntity<Mythology> createMythology(@RequestBody Mythology mythology) {
+        return ResponseEntity.ok(mythologyService.createMythology(mythology));
     }
 
     @GetMapping("/{id}")

@@ -1,4 +1,4 @@
-package com.MythologyNexus.service;
+package com.MythologyNexus.service.unit;
 
 import com.MythologyNexus.dto.*;
 import com.MythologyNexus.model.Character;
@@ -7,6 +7,7 @@ import com.MythologyNexus.repository.ArtefactRepo;
 import com.MythologyNexus.repository.CharacterRepo;
 import com.MythologyNexus.repository.MythologyRepo;
 import com.MythologyNexus.repository.PowerRepo;
+import com.MythologyNexus.service.CharacterService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
