@@ -2,6 +2,7 @@ package com.MythologyNexus.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ public class Character {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank(message = "Character name must not be empty!")
     private String name;
 
     private String description;
@@ -19,17 +21,17 @@ public class Character {
     @Enumerated(EnumType.STRING)
     private CharacterType type;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "mythology_id", nullable = false)
     private Mythology mythology;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "character_associated_powers",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "power_id"))
     private List<Power> powers;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "character_associated_characters",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_characters_id"))
@@ -37,7 +39,7 @@ public class Character {
     private List<Character> associatedCharacters = new ArrayList<>();
 
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "character_associated_artefacts",
             joinColumns = @JoinColumn(name = "character_id"),
             inverseJoinColumns = @JoinColumn(name = "associated_artefact_id"))
