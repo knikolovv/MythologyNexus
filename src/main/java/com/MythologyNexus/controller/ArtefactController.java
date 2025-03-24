@@ -3,6 +3,7 @@ package com.MythologyNexus.controller;
 import com.MythologyNexus.dto.ArtefactDTO;
 import com.MythologyNexus.model.Artefact;
 import com.MythologyNexus.service.ArtefactService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ArtefactController {
     }
 
     @PostMapping()
-    public ResponseEntity<Artefact> createArtefact(@RequestBody Artefact artefact) {
+    public ResponseEntity<Artefact> createArtefact(@Valid @RequestBody Artefact artefact) {
         Artefact savedArtefact = artefactService.createArtefact(artefact);
         return new ResponseEntity<>(savedArtefact, HttpStatus.OK);
     }
@@ -39,8 +40,8 @@ public class ArtefactController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ArtefactDTO> updateArtefactById(@PathVariable Long id, @RequestBody Artefact artefact) {
-        ArtefactDTO updateArtefact = artefactService.updateArtefact(id,artefact);
+    public ResponseEntity<ArtefactDTO> updateArtefactById(@PathVariable Long id, @Valid @RequestBody Artefact artefact) {
+        ArtefactDTO updateArtefact = artefactService.updateArtefact(id, artefact);
         return ResponseEntity.ok(updateArtefact);
     }
 

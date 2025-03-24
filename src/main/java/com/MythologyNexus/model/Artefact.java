@@ -1,7 +1,6 @@
 package com.MythologyNexus.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "artefact")
@@ -9,7 +8,6 @@ public class Artefact {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank(message = "Artefact name must not be Empty!")
     private String name;
     private String description;
 

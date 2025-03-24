@@ -1,4 +1,6 @@
 package com.MythologyNexus.dto;
 
-public record PowerDTO(Long id,String name) {
+import jakarta.validation.constraints.NotBlank;
+
+public record PowerDTO(Long id, @NotBlank(message = "Power name must not be empty!") String name) {
 }

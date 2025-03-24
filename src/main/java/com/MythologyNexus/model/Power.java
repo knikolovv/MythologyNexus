@@ -1,7 +1,6 @@
 package com.MythologyNexus.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "powers")
@@ -11,7 +10,6 @@ public class Power {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     private String name;
 
     public Power() {

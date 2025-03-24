@@ -4,6 +4,7 @@ import com.MythologyNexus.dto.CharacterDTO;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.CharacterType;
 import com.MythologyNexus.service.CharacterService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class CharacterController {
     }
 
     @PostMapping()
-    public ResponseEntity<CharacterDTO> createCharacter(@RequestBody Character character) {
+    public ResponseEntity<CharacterDTO> createCharacter(@Valid @RequestBody Character character) {
         CharacterDTO savedCharacter = characterService.createCharacter(character);
         return new ResponseEntity<>(savedCharacter, HttpStatus.CREATED);
     }
@@ -58,7 +59,7 @@ public class CharacterController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id, @RequestBody Character character) {
+    public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id,@Valid @RequestBody Character character) {
         CharacterDTO updatedCharacter = characterService.updateCharacter(id, character);
         return ResponseEntity.ok(updatedCharacter);
     }

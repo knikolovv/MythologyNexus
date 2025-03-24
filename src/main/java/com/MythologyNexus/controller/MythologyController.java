@@ -3,6 +3,7 @@ package com.MythologyNexus.controller;
 import com.MythologyNexus.dto.MythologyDTO;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.service.MythologyService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class MythologyController {
     }
 
     @PostMapping()
-    public ResponseEntity<Mythology> createMythology(@RequestBody Mythology mythology) {
+    public ResponseEntity<Mythology> createMythology(@Valid @RequestBody Mythology mythology) {
         return ResponseEntity.ok(mythologyService.createMythology(mythology));
     }
 
@@ -37,8 +38,8 @@ public class MythologyController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<MythologyDTO> updateMythology(@PathVariable Long id, @RequestBody Mythology mythology) {
-        MythologyDTO updateMythology = mythologyService.updateMythology(id,mythology);
+    public ResponseEntity<MythologyDTO> updateMythology(@PathVariable Long id,@Valid @RequestBody Mythology mythology) {
+        MythologyDTO updateMythology = mythologyService.updateMythology(id, mythology);
         return ResponseEntity.ok(updateMythology);
     }
 

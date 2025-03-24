@@ -3,6 +3,7 @@ package com.MythologyNexus.controller;
 import com.MythologyNexus.dto.PowerDTO;
 import com.MythologyNexus.model.Power;
 import com.MythologyNexus.service.PowerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class PowerController {
     }
 
     @PostMapping()
-    public ResponseEntity<Power> createPower(@RequestBody Power power) {
+    public ResponseEntity<Power> createPower(@Valid @RequestBody Power power) {
         Power savedPower = powerService.createPower(power);
         return ResponseEntity.ok(savedPower);
     }
@@ -39,7 +40,7 @@ public class PowerController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<PowerDTO> updatePower(@PathVariable Long id, @RequestBody Power power) {
+    public ResponseEntity<PowerDTO> updatePower(@PathVariable Long id,@Valid @RequestBody Power power) {
         PowerDTO updatePower = powerService.updatePowerById(id, power);
         return ResponseEntity.ok(updatePower);
     }

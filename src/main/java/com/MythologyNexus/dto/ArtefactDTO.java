@@ -1,4 +1,8 @@
 package com.MythologyNexus.dto;
 
-public record ArtefactDTO(Long id, String name, String description) {
+import jakarta.validation.constraints.NotBlank;
+
+public record ArtefactDTO(Long id,
+                          @NotBlank(message = "Artefact name must not be Empty!") String name,
+                          String description) {
 }
