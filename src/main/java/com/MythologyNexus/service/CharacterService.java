@@ -24,8 +24,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,23 +110,15 @@ public class CharacterService {
         }
 
         if (updatedCharacter.getPowers() != null && !updatedCharacter.getPowers().isEmpty()) {
-            List<Power> originalPowers = new ArrayList<>(existingCharacter.getPowers());
-
             List<Power> updatedPowers = updatedCharacter.getPowers().stream()
                     .map(power -> powerRepo.findByNameIgnoreCase(power.getName())
                             .orElse(power))
                     .collect(Collectors.toList());
 
             existingCharacter.setPowers(updatedPowers);
-
-            removeOrphanedItems(originalPowers,updatedPowers,
-                    Power::getId,
-                    powerRepo::countCharactersByPowerId,
-                    powerRepo::delete);
         }
 
         if (updatedCharacter.getArtefacts() != null && !updatedCharacter.getArtefacts().isEmpty()) {
-            List<Artefact> originalArtefacts = new ArrayList<>(existingCharacter.getArtefacts());
 
             List<Artefact> updatedArtefacts = updatedCharacter.getArtefacts().stream()
                     .map(artefact -> artefactRepo.findByNameIgnoreCase(artefact.getName())
@@ -136,11 +126,6 @@ public class CharacterService {
                     .collect(Collectors.toList());
 
             existingCharacter.setArtefacts(updatedArtefacts);
-
-            removeOrphanedItems(originalArtefacts,updatedArtefacts,
-                    Artefact::getId,
-                    artefactRepo::countCharacterByArtefactId,
-                    artefactRepo::delete);
         }
 
         Optional.ofNullable(updatedCharacter.getName())
@@ -228,21 +213,4 @@ public class CharacterService {
         }
         ResponseEntity.ok(primaryCharacter);
     }
-
-    private <T> void removeOrphanedItems(List<T> originalItems, List<T> updatedItems,
-                                         Function<T,Long> getIdFunction,
-                                         Function<Long,Long> countFunction,
-                                         Consumer<T> deleteFunction) {
-        List<T> orphanedItems = originalItems.stream()
-                .filter(item -> !updatedItems.contains(item))
-                .toList();
-
-        orphanedItems.forEach(item -> {
-            Long itemId = getIdFunction.apply(item);
-            if(countFunction.apply(itemId) == 0) {
-                deleteFunction.accept(item);
-            }
-        });
-    }
-
 }
