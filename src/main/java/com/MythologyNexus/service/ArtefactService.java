@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @Service
 public class ArtefactService {
-
     private final ArtefactRepo artefactRepo;
     private final CharacterRepo characterRepo;
     private final ArtefactMapper artefactMapper;
@@ -41,19 +40,18 @@ public class ArtefactService {
 
     public ArtefactDTO findArtefactByName(String name) {
         Artefact artefact = artefactRepo.findByNameIgnoreCase(name)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Artefact with " + name + "was not found!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artefact with " + name + "was not found!"));
         return artefactMapper.toDto(artefact);
     }
 
     public void deleteArtefactById(Long id) {
         List<Character> associatedCharacters = characterRepo.findByArtefactsId(id);
 
-        if(!associatedCharacters.isEmpty()) {
+        if (!associatedCharacters.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete artefact with ID " + id + " because it's associated with one or more characters.");
         }
         artefactRepo.deleteById(id);
     }
-
 
     public ArtefactDTO updateArtefact(Long id, Artefact artefact) {
         Artefact existingArtefact = artefactRepo.findById(id)

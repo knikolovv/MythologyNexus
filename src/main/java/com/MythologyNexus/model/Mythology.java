@@ -9,7 +9,6 @@ import java.util.List;
 @Entity
 @Table(name = "mythology")
 public class Mythology {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

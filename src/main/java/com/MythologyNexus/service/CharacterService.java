@@ -29,17 +29,12 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class CharacterService {
-
     @PersistenceContext
     private final EntityManager entityManager;
     private final CharacterRepo characterRepo;
-
     private final MythologyRepo mythologyRepo;
-
     private final PowerRepo powerRepo;
-
     private final ArtefactRepo artefactRepo;
-
     private final CharacterMapper characterMapper;
 
     @Autowired
@@ -97,7 +92,6 @@ public class CharacterService {
     }
 
     public CharacterDTO updateCharacter(Long id, Character updatedCharacter) {
-
         Character existingCharacter = characterRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Character not found!"));
 
@@ -136,7 +130,6 @@ public class CharacterService {
 
         Optional.ofNullable(updatedCharacter.getType())
                 .ifPresent(existingCharacter::setType);
-
 
         characterRepo.save(existingCharacter);
         return characterMapper.toDto(existingCharacter);
@@ -189,7 +182,7 @@ public class CharacterService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Associated character not found"));
 
         if (primaryCharacterName.equals(associateCharacterName)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Can not associate a character with itself!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can not associate a character with itself!");
         }
 
         if (!primaryCharacter.getAssociatedCharacters().contains(associatedCharacter)) {

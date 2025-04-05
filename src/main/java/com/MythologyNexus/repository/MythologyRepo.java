@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface MythologyRepo extends JpaRepository<Mythology,Long> {
+public interface MythologyRepo extends JpaRepository<Mythology, Long> {
     Optional<Mythology> findByNameIgnoreCase(String name);
 }

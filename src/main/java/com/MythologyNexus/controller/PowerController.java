@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/powers")
 public class PowerController {
-
     private final PowerService powerService;
 
     @Autowired
@@ -40,7 +39,7 @@ public class PowerController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<PowerDTO> updatePower(@PathVariable Long id,@Valid @RequestBody Power power) {
+    public ResponseEntity<PowerDTO> updatePower(@PathVariable Long id, @Valid @RequestBody Power power) {
         PowerDTO updatePower = powerService.updatePowerById(id, power);
         return ResponseEntity.ok(updatePower);
     }
@@ -50,6 +49,4 @@ public class PowerController {
         powerService.deletePower(id);
         return ResponseEntity.ok().build();
     }
-
-
 }

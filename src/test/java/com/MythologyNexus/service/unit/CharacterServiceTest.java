@@ -30,27 +30,20 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CharacterServiceTest {
-
     @Mock
     private CharacterRepo characterRepo;
-
     @Mock
     private CharacterMapper characterMapper;
-
     @Mock
     private MythologyRepo mythologyRepo;
-
     @Mock
     private PowerRepo powerRepo;
     @Mock
     private ArtefactRepo artefactRepo;
-
     @Mock
     private EntityManager entityManager;
-
     @InjectMocks
     private CharacterService characterService;
-
 
     @Test
     void testGetAllCharacters() {
@@ -248,11 +241,9 @@ class CharacterServiceTest {
         updatedCharacter.setArtefacts(updatedArtefacts);
 
         // Expected DTO after the update
-
         CharacterDTO updatedCharacterDTO = new CharacterDTO(1L, "Diana of Themyscira", "A citizen"
                 , CharacterType.HUMAN.getCharacterType(), newMythologyDTO, List.of(superStrengthDTO, superSpeedDTO),
                 null, List.of(lassoDTO));
-
 
         when(characterRepo.findById(1L)).thenReturn(Optional.of(existingCharacter));
         when(mythologyRepo.findByNameIgnoreCase(newMythology.getName())).thenReturn(Optional.empty());
@@ -398,11 +389,9 @@ class CharacterServiceTest {
         String primaryCharacterName = "Littlefoot";
         String associateCharacterName = "Cera";
 
-
         Character primaryCharacter = new Character();
         primaryCharacter.setId(1L);
         primaryCharacter.setName("Littlefoot");
-
 
         Character associateCharacter = new Character();
         associateCharacter.setId(2L);
@@ -424,11 +413,9 @@ class CharacterServiceTest {
         String primaryCharacterName = "Littlefoot";
         String associateCharacterName = "Cera";
 
-
         Character primaryCharacter = new Character();
         primaryCharacter.setId(1L);
         primaryCharacter.setName("Littlefoot");
-
 
         Character associateCharacter = new Character();
         associateCharacter.setId(2L);

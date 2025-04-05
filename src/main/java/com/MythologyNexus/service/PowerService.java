@@ -14,13 +14,11 @@ import java.util.Optional;
 
 @Service
 public class PowerService {
-
     private final PowerRepo powerRepo;
-
     private final PowerMapper powerMapper;
 
     @Autowired
-    public PowerService(PowerRepo powerRepo,PowerMapper powerMapper) {
+    public PowerService(PowerRepo powerRepo, PowerMapper powerMapper) {
         this.powerRepo = powerRepo;
         this.powerMapper = powerMapper;
     }
@@ -54,5 +52,4 @@ public class PowerService {
     public void deletePower(Long id) {
         powerRepo.deleteById(id);
     }
-
 }

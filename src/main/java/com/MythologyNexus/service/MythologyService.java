@@ -19,10 +19,9 @@ import java.util.Optional;
 @Transactional
 public class MythologyService {
     private final MythologyRepo mythologyRepo;
-
     private final CharacterRepo characterRepo;
-
     private final MythologyMapper mythologyMapper;
+
     @Autowired
     public MythologyService(MythologyRepo mythologyRepo, CharacterRepo characterRepo, MythologyMapper mythologyMapper) {
         this.mythologyRepo = mythologyRepo;
@@ -70,5 +69,4 @@ public class MythologyService {
 
         return mythologyMapper.toDto(mythology);
     }
-
 }

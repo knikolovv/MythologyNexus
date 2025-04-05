@@ -15,9 +15,7 @@ public class Character {
     private Long id;
     @NotBlank(message = "Character name must not be empty!")
     private String name;
-
     private String description;
-
     @Enumerated(EnumType.STRING)
     private CharacterType type;
 
@@ -37,7 +35,6 @@ public class Character {
             inverseJoinColumns = @JoinColumn(name = "associated_characters_id"))
     @JsonIgnoreProperties("associatedCharacters")
     private List<Character> associatedCharacters = new ArrayList<>();
-
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "character_associated_artefacts",

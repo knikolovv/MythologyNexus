@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface MythologyMapper {
-    @Mapping(target = "characters",source = "characters")
+    @Mapping(target = "characters", source = "characters")
     MythologyDTO toDto(Mythology mythology);
 
     default List<String> mapCharacterNames(List<Character> Characters) {

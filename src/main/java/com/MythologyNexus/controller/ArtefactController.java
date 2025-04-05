@@ -50,5 +50,4 @@ public class ArtefactController {
         artefactService.deleteArtefactById(id);
         return ResponseEntity.ok().build();
     }
-
 }

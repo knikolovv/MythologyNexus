@@ -6,11 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 @Table(name = "powers")
 public class Power {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotBlank(message = "Power name must not be empty!")
     private String name;
 
@@ -32,5 +30,4 @@ public class Power {
     public void setName(String powerName) {
         this.name = powerName;
     }
-
 }

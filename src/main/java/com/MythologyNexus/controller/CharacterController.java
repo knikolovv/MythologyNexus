@@ -24,8 +24,8 @@ public class CharacterController {
 
     @GetMapping("/multipleFilters")
     public ResponseEntity<List<CharacterDTO>> getAllCharactersByTypeOrMythology(@RequestParam(required = false) String type,
-                                                                                   @RequestParam(required = false) String mythology) {
-        List<CharacterDTO> characters = characterService.findCharacterByCriteriaUsingCriteriaAPI(type,mythology);
+                                                                                @RequestParam(required = false) String mythology) {
+        List<CharacterDTO> characters = characterService.findCharacterByCriteriaUsingCriteriaAPI(type, mythology);
         return ResponseEntity.ok(characters);
     }
 
@@ -59,7 +59,7 @@ public class CharacterController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id,@Valid @RequestBody Character character) {
+    public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id, @Valid @RequestBody Character character) {
         CharacterDTO updatedCharacter = characterService.updateCharacter(id, character);
         return ResponseEntity.ok(updatedCharacter);
     }
@@ -83,6 +83,4 @@ public class CharacterController {
         characterService.deleteCharacterById(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

@@ -18,14 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class MythologyIntegrationTest {
-
     @LocalServerPort
     private int port;
 
     private String getBaseUrl() {
         return "http://localhost:" + port + "/mythologies";
     }
-
 
     @Test
     void testCRUDMythologyOperations() {
@@ -38,7 +36,7 @@ public class MythologyIntegrationTest {
                 .body(mythology)
                 .when()
                 .post(getBaseUrl())
-            .then()
+                .then()
                 .statusCode(200)
                 .body("id", notNullValue())
                 .body("name", equalTo("Norse Mythology"))
@@ -65,7 +63,7 @@ public class MythologyIntegrationTest {
                 .patch(getBaseUrl() + "/{id}", id)
                 .then()
                 .statusCode(200)
-                .body("name",equalTo("Greek Mythology"));
+                .body("name", equalTo("Greek Mythology"));
 
         RestAssured.given()
                 .when()
@@ -76,7 +74,7 @@ public class MythologyIntegrationTest {
 
         RestAssured.given()
                 .when()
-                .delete(getBaseUrl() + "/{id}",id)
+                .delete(getBaseUrl() + "/{id}", id)
                 .then()
                 .statusCode(204);
 

@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/mythologies")
 public class MythologyController {
-
     private final MythologyService mythologyService;
 
     @Autowired
@@ -38,7 +37,7 @@ public class MythologyController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<MythologyDTO> updateMythology(@PathVariable Long id,@Valid @RequestBody Mythology mythology) {
+    public ResponseEntity<MythologyDTO> updateMythology(@PathVariable Long id, @Valid @RequestBody Mythology mythology) {
         MythologyDTO updateMythology = mythologyService.updateMythology(id, mythology);
         return ResponseEntity.ok(updateMythology);
     }

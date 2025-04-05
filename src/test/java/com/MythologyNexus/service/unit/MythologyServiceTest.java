@@ -23,22 +23,17 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MythologyServiceTest {
-
     @Mock
     private MythologyRepo mythologyRepo;
-
     @Mock
     private MythologyMapper mythologyMapper;
-
     @Mock
     private CharacterRepo characterRepo;
-
     @InjectMocks
     private MythologyService mythologyService;
 
     @Test
     public void testFindMythologyByIdThrowsErrorWhenGivenInvalidId() {
-
         when(mythologyRepo.findById(50000L)).thenReturn(Optional.empty());
 
         assertThrows(ResponseStatusException.class, () -> mythologyService.findMythologyById(50000L));
@@ -112,7 +107,6 @@ class MythologyServiceTest {
 
     @Test
     public void testDeleteMythologyMethodFailsWhenAssociatedCharactersExist() {
-
         when(characterRepo.findByMythologyId(1L)).thenReturn(List.of(new Character()));
 
         assertThrows(ResponseStatusException.class, () -> mythologyService.deleteMythology(1L));
@@ -152,6 +146,4 @@ class MythologyServiceTest {
         verify(mythologyRepo).findById(anyLong());
         verify(mythologyRepo).save(existingMythology);
     }
-
-
 }
