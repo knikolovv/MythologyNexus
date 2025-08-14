@@ -1,5 +1,7 @@
-package com.MythologyNexus.dto;
+package com.MythologyNexus.mappers;
 
+import com.MythologyNexus.dto.CharacterDTO;
+import com.MythologyNexus.dto.MythologyDTO;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.Mythology;
 import org.mapstruct.Mapper;

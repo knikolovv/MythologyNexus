@@ -1,7 +1,7 @@
 package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.ArtefactDTO;
-import com.MythologyNexus.dto.ArtefactMapper;
+import com.MythologyNexus.mappers.ArtefactMapper;
 import com.MythologyNexus.model.Artefact;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.repository.ArtefactRepo;

@@ -1,5 +1,6 @@
-package com.MythologyNexus.dto;
+package com.MythologyNexus.mappers;
 
+import com.MythologyNexus.dto.PowerDTO;
 import com.MythologyNexus.model.Power;
 import org.mapstruct.Mapper;
 

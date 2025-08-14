@@ -1,7 +1,7 @@
 package com.MythologyNexus.service.unit;
 
 import com.MythologyNexus.dto.MythologyDTO;
-import com.MythologyNexus.dto.MythologyMapper;
+import com.MythologyNexus.mappers.MythologyMapper;
 import com.MythologyNexus.model.Character;
 import com.MythologyNexus.model.Mythology;
 import com.MythologyNexus.repository.CharacterRepo;

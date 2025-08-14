@@ -1,7 +1,7 @@
 package com.MythologyNexus.service;
 
 import com.MythologyNexus.dto.PowerDTO;
-import com.MythologyNexus.dto.PowerMapper;
+import com.MythologyNexus.mappers.PowerMapper;
 import com.MythologyNexus.model.Power;
 import com.MythologyNexus.repository.PowerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
