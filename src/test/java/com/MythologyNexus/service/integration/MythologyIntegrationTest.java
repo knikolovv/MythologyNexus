@@ -1,25 +1,48 @@
 package com.MythologyNexus.service.integration;
 
 import com.MythologyNexus.model.Mythology;
-import io.restassured.RestAssured;
+import com.MythologyNexus.service.integration.config.TestSecurityConfig;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Testcontainers
+@ActiveProfiles("test")
+@Import(TestSecurityConfig.class)
 public class MythologyIntegrationTest {
     @LocalServerPort
     private int port;
+
+    @Container
+    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
+            .withDatabaseName("mythology_test")
+            .withUsername("mythology")
+            .withPassword("password");
+
+    @DynamicPropertySource
+    static void registerPgProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+    }
 
     private String getBaseUrl() {
         return "http://localhost:" + port + "/mythologies";
@@ -31,7 +54,7 @@ public class MythologyIntegrationTest {
         mythology.setName("Norse Mythology");
         mythology.setDescription("Gods and Monsters");
 
-        Integer generatedId = RestAssured.given()
+        Integer generatedId = given()
                 .contentType(ContentType.JSON)
                 .body(mythology)
                 .when()
@@ -47,7 +70,7 @@ public class MythologyIntegrationTest {
         Long id = generatedId.longValue();
         assertNotNull(id);
 
-        RestAssured.given()
+        given()
                 .when()
                 .get(getBaseUrl() + "/{id}", id)
                 .then()
@@ -56,7 +79,7 @@ public class MythologyIntegrationTest {
                 .body("description", equalTo("Gods and Monsters"));
 
         mythology.setName("Greek Mythology");
-        RestAssured.given()
+        given()
                 .contentType(ContentType.JSON)
                 .body(mythology)
                 .when()
@@ -65,20 +88,20 @@ public class MythologyIntegrationTest {
                 .statusCode(200)
                 .body("name", equalTo("Greek Mythology"));
 
-        RestAssured.given()
+        given()
                 .when()
                 .get(getBaseUrl() + "/{id}", id)
                 .then()
                 .statusCode(200)
                 .body("name", equalTo("Greek Mythology"));
 
-        RestAssured.given()
+        given()
                 .when()
                 .delete(getBaseUrl() + "/{id}", id)
                 .then()
                 .statusCode(204);
 
-        RestAssured.given()
+        given()
                 .when()
                 .get(getBaseUrl() + "/{id}", id)
                 .then()
